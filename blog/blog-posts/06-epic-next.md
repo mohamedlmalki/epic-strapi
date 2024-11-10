@@ -130,9 +130,9 @@ import { SummaryForm } from "@/components/forms/summary-form";
 // rest of the code
 
 export async function Header({ data }: Readonly<HeaderProps>) {
-  const user = await getUserMeLoader();
-  console.log(user);
   const { logoText, ctaButton } = data;
+  const user = await getUserMeLoader();
+
   return (
     <div className="flex items-center justify-between px-4 py-3 bg-white shadow-md dark:bg-gray-800">
       <Logo text={logoText.text} />
@@ -223,7 +223,7 @@ async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
   const formData = new FormData(event.currentTarget);
   const videoId = formData.get("videoId") as string;
 
-  console.log(videoId);
+  toast.success("Generating Summary");
 
   const summaryResponseData = await generateSummaryService(videoId);
   console.log(summaryResponseData, "Response from route handler");
@@ -291,25 +291,49 @@ export async function POST(req: NextRequest) {
 }
 ```
 
-Now, let's test our front end.
+Before we test our front end, let's add a check to our form to ensure we have a valid video ID or URL.
 
-![004-test-transcript.gif](../images/06-epic-next/004-test-transcript.gif)
+In the `summary-form.tsx` update the `handleFormSubmit` function with the following.
 
-Once we submit our form, you should see the response in the console.
+```tsx
+async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+  event.preventDefault();
+  setLoading(true);
 
-Excellent. Now that we have our transcript, we can use it to prepare our summary.
+  const formData = new FormData(event.currentTarget);
+  const videoId = formData.get("videoId") as string;
 
-But first, let's add some basic validation.
+  const processedVideoId = extractYouTubeID(videoId);
 
-Let's check our form to ensure we provide a proper video ID or URL.
+  if (!processedVideoId) {
+    toast.error("Invalid Youtube Video ID");
+    setLoading(false);
+    setValue("");
+    setError({
+      ...INITIAL_STATE,
+      message: "Invalid Youtube Video ID",
+      name: "Invalid Id",
+    });
+    return;
+  }
 
-Then, we will check if our user is logged in and has credits.
+  toast.success("Generating Summary");
 
-### Form Validation and Submission
+  const summaryResponseData = await generateSummaryService(processedVideoId);
+  console.log(summaryResponseData, "Response from route handler");
 
-First, let's add a util function to extract a valid video ID from our YouTube url. We will use it to validate the YouTube video ID and our.
+  toast.success("Testing Toast");
+  setLoading(false);
+}
+```
 
-And the following is inside our `utils.ts` file.
+Notice that we are using the `extractYouTubeID` function to ensure we have a valid YouTube video ID.
+
+If we don't have a valid video ID or URL, we will show an error message and stop the function from continuing.
+
+Now before we test our front end, let's add the `extractYouTubeID` function to our `utils.ts` file.
+
+Here is the code for the `extractYouTubeID` function.
 
 ```ts
 export function extractYouTubeID(urlOrID: string): string | null {
@@ -344,52 +368,121 @@ export function extractYouTubeID(urlOrID: string): string | null {
 }
 ```
 
-Let's navigate to our `summary-form.tsx` file and import our `extractYouTubeID`.
+Just make sure to import it in our `summary-form.tsx` file.
 
 ```tsx
 import { extractYouTubeID } from "@/lib/utils";
 ```
 
-And update it with the following changes inside our `handleFormSubmit` function.
+The complete `summary-form.tsx` file should look like the following.
 
-```tsx
-async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
-  event.preventDefault();
-  setLoading(true);
-  toast.success("Submitting Form");
+```jsx
+"use client";
 
-  const formData = new FormData(event.currentTarget);
-  const videoId = formData.get("videoId") as string;
+import { useState } from "react";
+import { toast } from "sonner";
+import { cn, extractYouTubeID } from "@/lib/utils";
 
-  const processedVideoId = extractYouTubeID(videoId);
+import { Input } from "@/components/ui/input";
+import { SubmitButton } from "@/components/custom/submit-button";
 
-  if (!processedVideoId) {
-    toast.error("Invalid Youtube Video ID");
+import { generateSummaryService } from "@/data/services/summary-service";
+
+interface StrapiErrorsProps {
+  message: string | null;
+  name: string;
+}
+
+const INITIAL_STATE = {
+  message: null,
+  name: "",
+};
+
+export function SummaryForm() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<StrapiErrorsProps>(INITIAL_STATE);
+  const [value, setValue] = useState<string>("");
+
+  async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData(event.currentTarget);
+    const videoId = formData.get("videoId") as string;
+
+    const processedVideoId = extractYouTubeID(videoId);
+
+    if (!processedVideoId) {
+      toast.error("Invalid Youtube Video ID");
+      setLoading(false);
+      setValue("");
+      setError({
+        ...INITIAL_STATE,
+        message: "Invalid Youtube Video ID",
+        name: "Invalid Id",
+      });
+      return;
+    }
+
+    toast.success("Generating Summary");
+
+    const summaryResponseData = await generateSummaryService(processedVideoId);
+    console.log(summaryResponseData, "Response from route handler");
+
+    toast.success("Testing Toast");
     setLoading(false);
-    setValue("");
-    setError({
-      ...INITIAL_STATE,
-      message: "Invalid Youtube Video ID",
-      name: "Invalid Id",
-    });
-    return;
   }
 
-  toast.success("Generating Summary");
+  function clearError() {
+    setError(INITIAL_STATE);
+    if (error.message) setValue("");
+  }
 
-  const summaryResponseData = await generateSummaryService(processedVideoId);
-  console.log(summaryResponseData, "Response from route handler");
+  const errorStyles = error.message
+    ? "outline-1 outline outline-red-500 placeholder:text-red-700"
+    : "";
 
-  toast.success("Summary Created");
-  setLoading(false);
+  return (
+    <div className="w-full max-w-[960px]">
+      <form
+        onSubmit={handleFormSubmit}
+        className="flex gap-2 items-center justify-center"
+      >
+        <Input
+          name="videoId"
+          placeholder={
+            error.message ? error.message : "Youtube Video ID or URL"
+          }
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onMouseDown={clearError}
+          className={cn(
+            "w-full focus:text-black focus-visible:ring-pink-500",
+            errorStyles
+          )}
+          required
+        />
+
+        <SubmitButton
+          text="Create Summary"
+          loadingText="Creating Summary"
+          loading={loading}
+        />
+      </form>
+    </div>
+  );
 }
 ```
 
-Let's test our front end.
+Now, let's test our front end. Make sure to provide a valid YouTube video ID or URL.
 
-![005-test-error.gif](https://api-prod.strapi.io/uploads/005_test_error_49108d4f15.gif)
+![004-test-transcript.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/004_test_transcript_6d68e3bb4b.gif)
 
-Nice, we can check if we have the proper Url or ID.
+Once we submit our form, you should see the response in the console.
+
+Excellent. Now that we have our transcript, we can use it to prepare our summary.
+
+### Check if a user is logged in and has available credits
 
 Now, let's navigate to our route handler at `src/app/api/summarize/route.ts` and add a check to check if a user is logged in and has available credits.
 
@@ -501,13 +594,12 @@ if (summaryResponseData.error) {
 // rest of the code
 ```
 
-The completed code should look like the following.
+The completed code in the `handleFormSubmit` function should look like the following.
 
 ```tsx
 async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
   event.preventDefault();
   setLoading(true);
-  toast.success("Submitting Form");
 
   const formData = new FormData(event.currentTarget);
   const videoId = formData.get("videoId") as string;
@@ -543,14 +635,14 @@ async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     return;
   }
 
-  toast.success("Summary Created");
+  toast.success("Testing Toast");
   setLoading(false);
 }
 ```
 
-Now, let's test our form.
+Now, let's test our form. Make sure to provide a valid YouTube video ID or URL and set credits to 0.
 
-![006-testing-credits.gif](../images/06-epic-next/006-testing-credits.gif)
+![006-testing-credits.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/006_testing_credits_c6fc523ec0.gif)
 
 Excellent, it is working. Now, we are ready to implement our logic to get our summary. Let's do it.
 
@@ -560,7 +652,7 @@ Now, let's write our logic to handle the generation of our summary with OpenAi a
 
 If you never used LangChain before, it is a tool that helps you simplify building AI-powered apps. You can learn about it [here](https://js.langchain.com/docs/get_started/introduction).
 
-![007-langchain.png](../images/06-epic-next/007-langchain.png)
+![007-langchain.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/007_langchain_ce13be3e2e.png)
 
 Before starting, install the following packages `@langchain/openai` and `langchain` with the following command.
 
@@ -571,6 +663,14 @@ yarn add @langchain/core @langchain/openai
 Nice. Now, let's make the following changes in our route handler: Navigate to `src/app/api/summarize/route.ts` and make the following changes.
 
 First, let's import all the required dependencies.
+
+```ts
+import { ChatOpenAI } from "@langchain/openai";
+import { PromptTemplate } from "@langchain/core/prompts";
+import { StringOutputParser } from "@langchain/core/output_parsers";
+```
+
+Now, let's create our `generateSummary` function.
 
 ```ts
 async function generateSummary(content: string, template: string) {
@@ -682,9 +782,113 @@ export async function POST(req: NextRequest) {
 
 In the code above, we implemented our `generateSummary` function, which will generate our summary and send it back to you via our form. We will also create a server action responsible for saving our data into our Strapi backend.
 
-But first, let's log the output to the console to see if we are getting back our summary.
+The complete code in the `route.ts` file should look like the following.
 
-First, create a `.env.local` file and add our Open AI API key.
+```ts
+import { NextRequest } from "next/server";
+import { getUserMeLoader } from "@/data/services/get-user-me-loader";
+import { getAuthToken } from "@/data/services/get-token";
+
+import { ChatOpenAI } from "@langchain/openai";
+import { PromptTemplate } from "@langchain/core/prompts";
+import { StringOutputParser } from "@langchain/core/output_parsers";
+
+const TEMPLATE = `
+INSTRUCTIONS: 
+  For the this {text} complete the following steps.
+  Generate the title for based on the content provided
+  Summarize the following content and include 5 key topics, writing in first person using normal tone of voice.
+  
+  Write a youtube video description
+    - Include heading and sections.  
+    - Incorporate keywords and key takeaways
+
+  Generate bulleted list of key points and benefits
+
+  Return possible and best recommended key words
+`;
+
+async function generateSummary(content: string, template: string) {
+  const prompt = PromptTemplate.fromTemplate(template);
+
+  const model = new ChatOpenAI({
+    openAIApiKey: process.env.OPENAI_API_KEY,
+    modelName: process.env.OPENAI_MODEL ?? "gpt-4o-mini",
+    temperature: process.env.OPENAI_TEMPERATURE
+      ? parseFloat(process.env.OPENAI_TEMPERATURE)
+      : 0.7,
+    maxTokens: process.env.OPENAI_MAX_TOKENS
+      ? parseInt(process.env.OPENAI_MAX_TOKENS)
+      : 4000,
+  });
+
+  const outputParser = new StringOutputParser();
+  const chain = prompt.pipe(model).pipe(outputParser);
+
+  try {
+    const summary = await chain.invoke({ text: content });
+    return summary;
+  } catch (error) {
+    if (error instanceof Error)
+      return new Response(JSON.stringify({ error: error.message }));
+    return new Response(
+      JSON.stringify({ error: "Failed to generate summary." })
+    );
+  }
+}
+
+export async function POST(req: NextRequest) {
+  const user = await getUserMeLoader();
+  const token = await getAuthToken();
+
+  if (!user.ok || !token) {
+    return new Response(
+      JSON.stringify({ data: null, error: "Not authenticated" }),
+      { status: 401 }
+    );
+  }
+
+  if (user.data.credits < 1) {
+    return new Response(
+      JSON.stringify({
+        data: null,
+        error: "Insufficient credits",
+      }),
+      { status: 402 }
+    );
+  }
+
+  const body = await req.json();
+  const videoId = body.videoId;
+  const url = `https://deserving-harmony-9f5ca04daf.strapiapp.com/utilai/yt-transcript/${videoId}`;
+
+  let transcriptData;
+
+  try {
+    const transcript = await fetch(url);
+    transcriptData = await transcript.text();
+  } catch (error) {
+    console.error("Error processing request:", error);
+    if (error instanceof Error)
+      return new Response(JSON.stringify({ error: error.message }));
+    return new Response(JSON.stringify({ error: "Unknown error" }));
+  }
+
+  let summary: Awaited<ReturnType<typeof generateSummary>>;
+
+  try {
+    summary = await generateSummary(transcriptData, TEMPLATE);
+    return new Response(JSON.stringify({ data: summary, error: null }));
+  } catch (error) {
+    console.error("Error processing request:", error);
+    if (error instanceof Error)
+      return new Response(JSON.stringify({ error: error.message }));
+    return new Response(JSON.stringify({ error: "Error generating summary." }));
+  }
+}
+```
+
+Before we test our form, let's add our Open AI API key to our `.env.local` file and add your Open AI API key.
 
 > **WARNING**: Ensure your `.gitignore` file ignores the `.env*.local` file from your commit so you don't leak your Open AI key.
 
@@ -727,7 +931,7 @@ First, create a new `collection-type` in Strapi admin to save our summary.
 
 Navigate to the content builder page and create a new collection named `Summary` with the following fields.
 
-![008-create-summary.png](../images/06-epic-next/008-create-summary.png)
+![008-create-summary.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/008_create_summary_14beffdc1b.png)
 
 Let's add the following fields.
 
@@ -746,11 +950,11 @@ So whenever we want to find all summaries for a user, we can simply query the **
 
 Here is what the final fields will look like.
 
-![010-summary-fields.png](../images/06-epic-next/010-summary-fields.png)
+![010-summary-fields.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/010_summary_fields_ea3cd5f130.png)
 
 Now, navigate to `Setting` and add the following permissions.
 
-![011-set-permissions.png](../images/06-epic-next/011-set-permissions.png)
+![011-set-permissions.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/011_set_permissions_afd3488bbe.png)
 
 Now that we have our **Summary** `collection-type`, let's create a server action to save our data to Strapi.
 
@@ -794,7 +998,6 @@ Update the `handleFormSubmit` with the following code.
 async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
   event.preventDefault();
   setLoading(true);
-  toast.success("Submitting Form");
 
   const formData = new FormData(event.currentTarget);
   const videoId = formData.get("videoId") as string;
@@ -816,7 +1019,18 @@ async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
   toast.success("Generating Summary");
 
   const summaryResponseData = await generateSummaryService(processedVideoId);
-  console.log(summaryResponseData, "Response from route handler");
+
+  if (summaryResponseData.error) {
+    setValue("");
+    toast.error(summaryResponseData.error);
+    setError({
+      ...INITIAL_STATE,
+      message: summaryResponseData.error,
+      name: "Summary Error",
+    });
+    setLoading(false);
+    return;
+  }
 
   const payload = {
     data: {
@@ -833,16 +1047,23 @@ async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     setValue("");
     setError(INITIAL_STATE);
   } catch (error) {
-    toast.error("Error Creating Summary");
+    let errorMessage =
+      "An unexpected error occurred while creating the summary";
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === "string") {
+      errorMessage = error;
+    }
+
+    toast.error(errorMessage);
     setError({
-      ...INITIAL_STATE,
-      message: "Error Creating Summary",
+      message: errorMessage,
       name: "Summary Error",
     });
     setLoading(false);
     return;
   }
-
   setLoading(false);
 }
 ```
@@ -855,7 +1076,7 @@ Let's do a quick test and see if it works. We should be redirected to our `summa
 
 But you should see your data in your Strapi Admin.
 
-![013-1-response.png](../images/06-epic-next/013-1-response.png)
+![013-1-response.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/013_1_response_fc4b9f6694.png)
 
 You will notice that we are not setting our user or deducting one credit on creation. We will do this in Strapi by creating custom middleware. But first, let's finish all of our Next.js UI.
 
@@ -955,15 +1176,72 @@ export async function getSummaries() {
 
 Now, we need to update the following permissions in the Strapi dashboard.
 
-![014-permissions.gif](../images/06-epic-next/014-permissions.gif)
+![014-permissions.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/014_permissions_9b26108b1d.gif)
 
 Under `Settings` => `User Permissions` => `Roles` => `Authenticated`, set the **Global** and **Home-page** checkboxes to `checked`.
 
 Restart your application, and you should now be able to view the list.
 
-![014-1-list.png](../images/06-epic-next/014-1-list.png)
+![014-1-list.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/014_1_list_433167eef1.png)
 
-Now, let's create the **Single Card** view.
+Before we create the **Single Card** view, let's create a component that will display our markdown in a readable format.
+
+We will use a package called `react-markdown` to display our markdown. You can find it [here](https://www.npmjs.com/package/react-markdown).
+
+And install it with the following command.
+
+```bash
+ yarn add react-markdown
+```
+
+After installing `react-markdown`, let's update our `summaries/page.tsx` file to use it.
+
+We will make the following change here.
+
+```tsx
+<CardContent>
+  <p className="w-full mb-4 leading-7">
+    {summary.slice(0, 164) + " [read more]"}
+  </p>
+</CardContent>
+```
+
+And update to the following.
+
+```tsx
+<CardContent>
+  <ReactMarkdown
+    className="card-markdown prose prose-sm max-w-none
+              prose-headings:text-gray-900 prose-headings:font-semibold
+              prose-p:text-gray-600 prose-p:leading-relaxed
+              prose-a:text-pink-500 prose-a:no-underline hover:prose-a:underline
+              prose-strong:text-gray-900 prose-strong:font-semibold
+              prose-ul:list-disc prose-ul:pl-4
+              prose-ol:list-decimal prose-ol:pl-4"
+  >
+    {summary.slice(0, 164) + " [read more]"}
+  </ReactMarkdown>
+</CardContent>
+```
+
+We are styling it with Tailwind in line. For this to work,you will need to install the `@tailwindcss/typography` package.
+
+```bash
+yarn add @tailwindcss/typography
+```
+
+And update your `tailwind.config.ts` in the plugins array with the following code.
+
+```ts
+  plugins: [
+    require("tailwindcss-animate"),
+    require("@tailwindcss/typography"),
+  ],
+```
+
+It should now look a bit nicer, feel free to style it more. I will show you another example of this soon.
+
+But first, let's create the **Single Card** view.
 
 First, we will create a dynamic route; you can learn more about dynamic routes in Next.Js docs [here](https://nextjs.org/docs/pages/building-your-application/routing/dynamic-routes).
 
@@ -1014,9 +1292,28 @@ export default async function SummaryCardRoute({
 }
 ```
 
+The above code will give us a warning in Next 15.
+
+``` bash
+Error: Route "/dashboard/summaries/[videoId]" used `params.videoId`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+```
+
+[You can read more about it here](https://nextjs.org/docs/messages/sync-dynamic-apis#why-this-warning-occurred)
+
+Let's run the following command to fix it.
+
+```bash
+npx @next/codemod@canary next-async-request-api
+```
+
+and refactor the code to the following.
+
+```tsx
+```
+
 Now when you click on the summary card, you should be navigated to the single summary view and see our placeholder text.
 
-![015-single-view.gif](../images/06-epic-next/015-single-view.gif)
+![015-single-view.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/015_single_view_a1fba8ba81.gif)
 
 Now that we know our pages work, let's create the loaders to get the appropriate data.
 
@@ -1145,7 +1442,7 @@ export function SummaryCardForm({
   readonly item: any;
   readonly className?: string;
 }) {
-  // const deleteSummaryById = deleteSummaryAction.bind(null, item.id);
+  // const deleteSummaryById = deleteSummaryAction.bind(null, item.documentId);
 
   return (
     <Card className={cn("mb-8 relative h-auto", className)}>
@@ -1168,7 +1465,7 @@ export function SummaryCardForm({
               className="flex w-full rounded-md bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:bg-gray-50 focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 mb-4 h-[calc(100vh-245px)] "
               defaultValue={item.summary}
             />
-            <input type="hidden" name="id" value={item.id} />
+            <input type="hidden" name="id" value={item.documentId} />
             <SubmitButton
               text="Update Summary"
               loadingText="Updating Summary"
@@ -1242,11 +1539,9 @@ export default async function SummaryCardRoute({
 }
 ```
 
-![016-summary.png](https://api-prod.strapi.io/uploads/016_summary_52f3ea2c5f.png)
+Nice. Everything works.
 
-![017-generating-summary.gif](../images/06-epic-next/017-generating-summary.gif)
-
-Now that we know our front end works. Let's revisit our route handler.
+![017-generating-summary.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/017_generating_summary_969b602c54.gif)
 
 ## Using Strapi Route Middleware To Set User/Summary Relation
 
@@ -1262,8 +1557,9 @@ In Strapi, a route middleware is a type of middleware that has a more limited sc
 
 They control the request flow and can change the request itself before moving forward.
 
-![018-middleware.png](../images/06-epic-next/018-middleware.png)
+![018-middleware.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/018_middleware_85c6da3764.png)
 
+Now that we know our front end works. Let's revisit our route handler.
 They can also be used to control access to a route and perform additional logic.
 
 For example, they can be used instead of policies to control access to an endpoint. They could modify the context before passing it down to further core elements of the Strapi server.
@@ -1415,7 +1711,7 @@ Now, restart your Strapi backend and Next.js frontend and create a new summary.
 
 You will see that we are now setting our user data.
 
-![020-setting-user.png](https://api-prod.strapi.io/uploads/020_setting_user_041740dd67.png)
+![020-setting-user.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/020_setting_user_c68234864b.png)
 
 ## Conclusion
 

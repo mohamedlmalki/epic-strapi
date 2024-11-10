@@ -102,11 +102,19 @@ Second, replace the `img` tag with the following.
 <StrapiImage
   alt={image.alternativeText ?? "no alternative text"}
   className="absolute inset-0 object-cover w-full h-full aspect/16:9"
-  src={imageURL}
+  src={image.url}
   height={1080}
   width={1920}
 />
 ```
+
+And remove the following reference we had before.
+
+```jsx
+const imageURL = "http://localhost:1337" + image.url;
+```
+
+This is now handled inside of our **StrapiImage** component.
 
 Restart the application, and... you will see the following error.
 
@@ -117,8 +125,10 @@ Clicking on the link in the error will take you [here](https://nextjs.org/docs/m
 Inside the root of your project, locate the `next.config.mjs` file and make the following change.
 
 ```js
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  /* config options here */
   images: {
     remotePatterns: [
       {
@@ -134,11 +144,9 @@ const nextConfig = {
 export default nextConfig;
 ```
 
-Since we have a fall back URL inside our image, we are also referencing it here.
-
 Now, when you restart your application, you should see the following with your image.
 
-![003-image-fix.png](/images/03-epic-next/003-image-fix.png)
+![003-image-fix.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/003_image_fix_0db4ed29aa.png)
 
 Nice, now let's work on our **Features Section**
 
@@ -160,18 +168,18 @@ So, let's jump into our Strapi Admin and create our **Features Section** Compone
 
 Let's start by navigating to `Content-Type Builder` under `COMPONENTS`, clicking on `Create new component`, and let's call it **Features Section** and save it under the `layout` category.
 
-![005-create-features-section.png](/images/03-epic-next/005-create-features-section.png)
+![005-create-features-section.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/005_create_features_section_768808ac4b.png)
 
 We will create the following fields.
 
 Text -> Short Text - title
 Text -> Long Text - description
 
-![006-create-features-fields.png](/images/03-epic-next/006-create-features-fields.png)
+![006-create-features-fields.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/006_create_features_fields_593404b5d3.png)
 
 Finally, let's create a repeatable component called **Feature** and save it under **components**
 
-![007-create-features-component.gif](/images/03-epic-next/007-create-features-component.gif)
+![007-create-features-component.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/007_create_features_component_5f9ec73be4.gif)
 
 Now, add the following fields.
 
@@ -183,21 +191,21 @@ Enum -> with the following options
 - CHECK_ICON
 - CLOUD_ICON
 
-![008-create-features-component-field.gif](/images/03-epic-next/008-create-features-component-field.gif)
+![008-create-features-component-field.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/008_create_features_component_field_803f394dac.gif)
 
 Let's add our newly created **Feature Section** component to our home page.
 
-![009-add-features-to-page.gif](/images/03-epic-next/009-add-features-to-page.gif)
+![009-add-features-to-page.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/009_add_features_to_page_3cf40d20dd.gif)
 
 Now, let's add some features data and save.
 
 Navigate to **Content Manager**, select the **Home Page**, add the new **Features Section** block, and fill in your features.
 
-![010-adding-data.gif](/images/03-epic-next/010-adding-data.gif)
+![010-adding-data.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/010_adding_data_4eec82e3dd.gif)
 
 We are already getting our page data; let's navigate to `src/app/page.tsx` and update our query to populate our `feature` repeatable component.
 
-![011-populate-feature.png](/images/03-epic-next/011-populate-feature.png)
+![011-populate-feature.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/011_populate_feature_273e9cebc6.png)
 
 Let's update the `homePageQuery` query with the following changes. Remember in **Strapi 5** we have to user the `on` flag to populate our dynamic zone components.
 
@@ -230,6 +238,12 @@ const homePageQuery = qs.stringify({
 ```
 
 Also, let's update our `getStrapiData` function to use our new helper method, `getStrapiURL.` So it will look like the following.
+
+So don't forget to import it.
+
+```jsx
+import { getStrapiURL } from "@/lib/utils";
+```
 
 ```jsx
 async function getStrapiData(path: string) {
@@ -439,7 +453,7 @@ return (
 
 When we restart our application and refresh the page with `command + r`, we should see the following.
 
-![012-features-view.png](/images/03-epic-next/012-features-view.png)
+![012-features-view.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/012_features_view_7f6de4ebed.png)
 
 Now, let's pass our data to our component and refactor our **Features Section** component to consume our data from Strapi.
 
@@ -683,7 +697,7 @@ export default async function Home() {
 
 ```
 
-Let's do one more quick refactor. In `src`, create a new folder named `data` with a file called `loaders.tsx`.
+Let's do one more quick refactor. In `src`, create a new folder named `data` with a file called `loaders.ts`.
 
 And add the following code.
 
@@ -714,7 +728,7 @@ async function fetchData(url: string) {
 }
 ```
 
-We will create a reusable function that will help us construct additional methods to load data.
+This will be our reusable function that will help us construct additional methods to load data.
 
 And finally, let's create a new function, `getHomePageData,` to load our home page data.
 
@@ -762,6 +776,12 @@ import { getHomePageData } from "@/data/loaders";
 import { HeroSection } from "@/components/custom/hero-section";
 import { FeatureSection } from "@/components/custom/features-section";
 
+export default async function Home() {
+  const strapiData = await getHomePageData();
+  const { blocks } = strapiData?.data || [];
+  return <main>{blocks.map(blockRenderer)}</main>;
+}
+
 const blockComponents = {
   "layout.hero-section": HeroSection,
   "layout.features-section": FeatureSection,
@@ -771,21 +791,6 @@ function blockRenderer(block: any) {
   const Component = blockComponents[block.__component as keyof typeof blockComponents];
   return Component ? <Component key={block.id} data={block} /> : null;
 }
-
-export default async function Home() {
-  const strapiData = await getHomePageData();
-
-  console.dir(strapiData, { depth: null });
-
-  const { blocks } = strapiData?.data || [];
-
-  return (
-    <main>
-      {blocks.map(blockRenderer)}
-    </main>
-  );
-}
-
 ```
 
 Nice. Let's move on and start working on our **Header** and **Footer**
@@ -812,7 +817,7 @@ We are going to call it `Global`. Go ahead and add the following fields.
 Text -> Short Text - title
 Text -> Long Text - description
 
-![015-global-content.gif](/images/03-epic-next/015-global-content.gif)
+![015-global-content.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/015_global_content_909baa64b1.gif)
 
 Now, let's create the **Header** component. To start with, it will have two links: logo text and a `call to action` button.
 
@@ -820,7 +825,7 @@ Now, let's create the **Header** component. To start with, it will have two link
 
 In Strapi, inside the global page, let's add the following component.
 
-![016-add-heading-component.gif](/images/03-epic-next/016-add-heading-component.gif)
+![016-add-heading-component.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/016_add_heading_component_792af18c8a.gif)
 
 - Click on `add another field to this single type.`
 - Select the `Component` field type
@@ -834,7 +839,7 @@ Now let's create two additional components called `logoText` and `ctaButton` to 
 
 Since both will be links, we can reuse a previously created **Link** component.
 
-![017-create-logo-text.gif](/images/03-epic-next/017-create-logo-text.gif)
+![017-create-logo-text.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/017_create_logo_text_489dd6cf66.gif)
 
 - Select the `Component` field type
 - Click on `Use an existing component`
@@ -854,7 +859,7 @@ Since both will be links, we can reuse a previously created **Link** component.
 
 The final **Header** component should look like the following.
 
-![019-header.png](/images/03-epic-next/019-header.png)
+![019-header.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/019_header_97a595fd04.png)
 
 Now that we are getting the hang of modeling content think about how we can represent our footer.
 
@@ -870,7 +875,7 @@ Can you do it on your own?
 
 Our **Footer** will have the following fields.
 
-![021-footer-fields.png](/images/03-epic-next/021-footer-fields.png)
+![021-footer-fields.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/021_footer_fields_40bc2f6d8e.png)
 
 Our footer has the following three items.
 
@@ -878,13 +883,13 @@ If you get stuck at any point, you can always ask in the comments or join us at 
 
 Let's add some data to our **Global** single type.
 
-![022-add-global-content.gif](/images/03-epic-next/022-add-global-content.gif)
+![022-add-global-content.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/022_add_global_content_d9bdd49b59.gif)
 
 Now, let's give the proper permissions so we can access the data from our Strapi API.
 
 Navigate to `Setting` -> `USERS AND PERMISSION PLUGIN` -> `Roles` -> `Public` -> `Global` and check the `find` checkbox. We now should be able to make a `GET` request to `/api/global` and see our data.
 
-![023-permissions.png](/images/03-epic-next/023-permissions.png)
+![023-permissions.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/023_permissions_069f648663.png)
 
 Since we have already learned about Strapi's **Populate**, we can jump straight into our frontend code and implement the function to fetch our **Global** data.
 
@@ -892,7 +897,7 @@ Since we have already learned about Strapi's **Populate**, we can jump straight 
 
 Let's navigate to `src/data/loaders.ts` and create a new function called `getGlobalData`; it should look like the following.
 
-```jsx
+```ts
 export async function getGlobalData() {
   const url = new URL("/api/global", baseUrl);
 
@@ -961,7 +966,6 @@ const geistSans = localFont({
   variable: "--font-geist-sans",
   weight: "100 900",
 });
-
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
@@ -1105,7 +1109,7 @@ Next, let's create our actual **Header** component. Navigate to `src/app/compone
 
 ```jsx
 import Link from "next/link";
-import { Logo } from "@/components/custom/Logo";
+import { Logo } from "@/components/custom/logo";
 import { Button } from "@/components/ui/button";
 
 interface HeaderProps {
@@ -1152,9 +1156,8 @@ Next, make the following change in the `return` statement.
 ```jsx
 return (
   <html lang="en">
-    <body className={inter.className}>
-      <Header data={globalData.data.header} /> // add our header and pass in the
-      data
+    <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <Header data={globalData.data.header} />
       <div>{children}</div>
     </body>
   </html>
@@ -1163,7 +1166,7 @@ return (
 
 Restart your project, and you should now see our awesome top navigation.
 
-![024-top-nav.png](/images/03-epic-next/024-top-nav.png)
+![024-top-nav.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/024_top_nav_b30769478f.png)
 
 ### Building Our Footer In Next.js
 
@@ -1177,7 +1180,7 @@ Navigate to `src/app/components/custom,` create a file called `footer.tsx,` and 
 
 ```jsx
 import Link from "next/link";
-import { Logo } from "@/components/custom/Logo";
+import { Logo } from "@/components/custom/logo";
 
 interface SocialLink {
   id: number;
@@ -1349,105 +1352,11 @@ Now, if you restart the Next.js application, you should see the following change
 
 Yay, we are now getting our data from our Strapi API.
 
-If you don't see the changes, it is because Next.js is caching our old data.
-
-## Let's revisit Next.js Data Caching
-
-Next.js caching is a big topic, so make sure to read the docs [here](https://nextjs.org/docs/app/building-your-application/caching)
-
-In the current state of our app, Next.js is caching our data.
-
-You will get the following output if we run `yarn build`.
-
-```bash
- ✓ Generating static pages (5/5)
- ✓ Collecting build traces
- ✓ Finalizing page optimization
-
-Route (app)                              Size     First Load JS
-┌ ○ /                                    5.2 kB         96.3 kB
-└ ○ /_not-found                          885 B          85.2 kB
-+ First Load JS shared by all            84.3 kB
-  ├ chunks/69-3c42ded033075db6.js        29 kB
-  ├ chunks/fd9d1056-c7082c319cc53ced.js  53.4 kB
-  └ other shared chunks (total)          1.86 kB
-
-
-○  (Static)  prerendered as static content
-
-✨  Done in 10.65s.
-
-```
-
-Our content is statically generated, so to update our app with the changes, we would have to rebuild our site.
-
-There are two ways we can handle this in `development` while we are working with our app.
-
-We can keep everything as is and use `command-shift-r` to reload the cache, which I was reminded of when chatting with Lee Robinson. I always forget about this. You can follow him on [Twitter](https://twitter.com/leeerob).
-
-Or we can opt out of caching. Outside of the previous method discussed, we can use the `noStore` function; you can read more about it [here](https://nextjs.org/docs/app/api-reference/functions/unstable_noStore).
-
-I will show the code for the `noStore` function, but in this tutorial, we will just use `command-shift-r` to refresh the cache.
-So, let's navigate to our `src/data/loaders.ts` file, you can make the following changes.
-
-First, let's import the `noStore` function.
-
-```bash
-import { unstable_noStore as noStore } from 'next/cache';
-```
-
-Now, let's use it inside the `getGlobalData` that is responsible for our social links.
-
-```ts
-export async function getGlobalData() {
-  noStore();
-  const url = new URL("/api/global", baseUrl);
-
-  url.search = qs.stringify({
-    populate: [
-      "header.logoText",
-      "header.ctaButton",
-      "footer.logoText",
-      "footer.socialLink",
-    ],
-  });
-
-  return await fetchData(url.href);
-}
-```
-
-Now run the `yarn build` command, and you will see the following output.
-
-```bash
-Route (app)                              Size     First Load JS
-┌ λ /                                    5.2 kB         96.3 kB
-└ λ /_not-found                          885 B          85.2 kB
-+ First Load JS shared by all            84.3 kB
-  ├ chunks/69-3c42ded033075db6.js        29 kB
-  ├ chunks/fd9d1056-c7082c319cc53ced.js  53.4 kB
-  └ other shared chunks (total)          1.86 kB
-
-
-λ  (Dynamic)  server-rendered on demand using Node.js
-
-✨  Done in 10.48s.
-```
-
-Notice that our `/` route now has the `λ` symbol, which demonstrates that it is now server-rendered on demand.
-
-This is due to using `noStore` please note Even though `noStore` is defined at the component level, the entire route becomes dynamic.
-
-If we reorder our social links in our **Strapi Admin** panel now, our changes will reflect on our Next.js frontend.
-
-note: you don't need to use `noStore` I just wanted to show you that it exists, and you can continue to refresh the site with `command-shift-r`.
-
-In future posts we will take look how to use `revalidatePath` to revalidate our cache.
-
 ## How To Populate Our Metadata Dynamically In Next.js
 
 We have a `title` and `description` on our **Global** page in Strapi.
 
-![033-metadata.png](/images/03-epic-next/033-metadata.png)
+![033-metadata.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/033_metadata_8e407cfa95.png)
 
 Let's use it as our `metadata` information in our app.
 
@@ -1511,11 +1420,10 @@ Now, replace the previous `export const metadata: Metadata` with the following c
 ```jsx
 export async function generateMetadata(): Promise<Metadata> {
   const metadata = await getGlobalPageMetadata();
-  const { title, description } = metadata?.data;
 
   return {
-    title: title ?? "Epic Next Course",
-    description: description ?? "Epic Next Course",
+    title: metadata?.data?.title ?? "Epic Next Course",
+    description: metadata?.data?.description ?? "Epic Next Course",
   };
 }
 ```
@@ -1539,7 +1447,6 @@ const geistSans = localFont({
   variable: "--font-geist-sans",
   weight: "100 900",
 });
-
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
@@ -1548,18 +1455,17 @@ const geistMono = localFont({
 
 export async function generateMetadata(): Promise<Metadata> {
   const metadata = await getGlobalPageMetadata();
-  const { title, description } = metadata?.data;
 
   return {
-    title: title ?? "Epic Next Course",
-    description: description ?? "Epic Next Course",
+    title: metadata?.data?.title ?? "Epic Next Course",
+    description: metadata?.data?.description ?? "Epic Next Course",
   };
 }
 
 export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode,
+  children: React.ReactNode;
 }>) {
   const globalData = await getGlobalData();
   console.dir(globalData, { depth: null });
@@ -1575,6 +1481,7 @@ export default async function RootLayout({
     </html>
   );
 }
+
 ```
 
 Nice job.

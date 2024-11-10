@@ -256,6 +256,14 @@ And replace them with the new changes.
 </div>
 ```
 
+Let's also add the following to check if there is no header data, and display this message.
+
+```tsx
+if (!data) return <div>No Header Data</div>;
+```
+
+We will keep this basic check but feel free to add more robust checks if you like.
+
 The completed code in our `header.tsx` file should look like the following.
 
 ```tsx
@@ -306,9 +314,9 @@ export function LoggedInUser({
 }
 
 export async function Header({ data }: Readonly<HeaderProps>) {
-  const user = await getUserMeLoader();
-  console.log(user);
   const { logoText, ctaButton } = data;
+  const user = await getUserMeLoader();
+
   return (
     <div className="flex items-center justify-between px-4 py-3 bg-white shadow-md dark:bg-gray-800">
       <Logo text={logoText.text} />
@@ -339,46 +347,50 @@ import Link from "next/link";
 import { getUserMeLoader } from "@/data/services/get-user-me-loader";
 import { StrapiImage } from "@/components/custom/strapi-image";
 
-interface ImageProps {
+interface Image {
   id: number;
+  documentId: string;
   url: string;
-  alternativeText: string;
+  alternativeText: string | null;
 }
 
-interface LinkProps {
+interface Link {
   id: number;
   url: string;
   text: string;
 }
 
 interface HeroSectionProps {
-  data: {
-    id: number;
-    __component: string;
-    heading: string;
-    subHeading: string;
-    image: ImageProps;
-    link: LinkProps;
-  };
+  id: number;
+  documentId: string;
+  __component: string;
+  heading: string;
+  subHeading: string;
+  image: Image;
+  link: Link;
 }
 
-export async function HeroSection({ data }: Readonly<HeroSectionProps>) {
+export async function HeroSection({
+  data,
+}: {
+  readonly data: HeroSectionProps;
+}) {
   const user = await getUserMeLoader();
-  const { heading, subHeading, image, link } = data;
+  const userLoggedIn = user?.ok;
 
-  const userLoggedIn = user.ok;
+  const { heading, subHeading, image, link } = data;
   const linkUrl = userLoggedIn ? "/dashboard" : link.url;
 
   return (
     <header className="relative h-[600px] overflow-hidden">
       <StrapiImage
-        alt="Background"
-        className="absolute inset-0 object-cover w-full h-full"
-        height={1080}
+        alt={image.alternativeText ?? "no alternative text"}
+        className="absolute inset-0 object-cover w-full h-full aspect/16:9"
         src={image.url}
+        height={1080}
         width={1920}
       />
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white bg-black bg-opacity-20">
+      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white bg-black bg-opacity-40">
         <h1 className="text-4xl font-bold md:text-5xl lg:text-6xl">
           {heading}
         </h1>
@@ -403,7 +415,7 @@ Now, let's work on our **Account** Page.
 
 ## Creating Our User Profile Page (Account Page)
 
-Let's start by navigating our `dashboard` folder and creating an `account` folder with a `page.tsx` file.
+Let's start by navigating to our `dashboard` folder and creating an `account` folder with a `page.tsx` file.
 
 We will add the following code.
 
@@ -479,17 +491,17 @@ export function ProfileForm({
             id="username"
             name="username"
             placeholder="Username"
-            defaultValue={data.username || ""}
+            defaultValue={data?.username || ""}
             disabled
           />
           <Input
             id="email"
             name="email"
             placeholder="Email"
-            defaultValue={data.email || ""}
+            defaultValue={data?.email || ""}
             disabled
           />
-          <CountBox text={data.credits} />
+          <CountBox text={data?.credits} />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -497,13 +509,13 @@ export function ProfileForm({
             id="firstName"
             name="firstName"
             placeholder="First Name"
-            defaultValue={data.firstName || ""}
+            defaultValue={data?.firstName || ""}
           />
           <Input
             id="lastName"
             name="lastName"
             placeholder="Last Name"
-            defaultValue={data.lastName || ""}
+            defaultValue={data?.lastName || ""}
           />
         </div>
         <Textarea
@@ -511,7 +523,7 @@ export function ProfileForm({
           name="bio"
           placeholder="Write your bio here..."
           className="resize-none border rounded-md w-full h-[224px] p-2"
-          defaultValue={data.bio || ""}
+          defaultValue={data?.bio || ""}
           required
         />
       </div>
@@ -543,7 +555,6 @@ export default async function AccountRoute() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 p-4">
-      Account Page
       <ProfileForm data={userData} className="col-span-3" />
       {/* <ProfileImageForm data={userImage} className="col-span-2" /> */}
     </div>
@@ -563,7 +574,7 @@ Second, we are not able to submit the form because we have not implemented the f
 
 Inside our Strapi Admin area, navigate to the `content-builder` and choose the user collection type.
 
-![006-user-admin.png](../images/05-epic-next/006-user-admin.png)
+![006-user-admin.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/006_user_admin_6ecf42f564.png)
 
 Let's add the following fields.
 
@@ -578,15 +589,15 @@ We will manually add the credits for new users when they sign in, but their defa
 
 Once you are done, you should have the following new fields.
 
-![007-user-fields.png](../images/05-epic-next/007-user-fields.png)
+![007-user-fields.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/007_user_fields_07a3cc7333.png)
 
 Now, let's manually update our users' information so we can check whether we are getting it in our front end.
 
-![008-user-updated.png](../images/05-epic-next/008-user-updated.png)
+![008-user-updated.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/008_user_updated_61cf92c25f.png)
 
 Navigating to your `Account` page on your front end should see the following output.
 
-![009-updated-user-ui.png](../images/05-epic-next/009-updated-user-ui.png)
+![009-updated-user-ui.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/009_updated_user_ui_9a47ea0b0c.png)
 
 Let's move on to the form update using **server action**.
 
@@ -594,7 +605,7 @@ Let's move on to the form update using **server action**.
 
 First, let's create our `updateProfileAction` responsible for handling our form submission.
 
-Navigate to `src/data/actions`, create a new file called `profile-actions` and paste in the following code.
+Navigate to `src/data/actions`, create a new file called `profile-actions.ts` and paste in the following code.
 
 ```tsx
 "use server";
@@ -640,11 +651,11 @@ Navigate to your `profile-form.tsx` file and make the following changes.
 First, let's import our action with the following.
 
 ```jsx
-import { useFormState } from "react-dom";
+import { useActionState} from "react";
 import { updateProfileAction } from "@/data/actions/profile-actions";
 ```
 
-Next, let's create the initial state for our `useFormState`.
+Next, let's create the initial state for our `useActionState`.
 
 ```jsx
 const INITIAL_STATE = {
@@ -662,7 +673,7 @@ But we will import our **StrapiErrors** component and handle those.
 import { StrapiErrors } from "@/components/custom/strapi-errors";
 ```
 
-Before using the `useFormState` as we did in previous sections, let's look at how we can bind additional data that we would like to pass to our server actions.
+Before using the `useActionState` as we did in previous sections, let's look at how we can bind additional data that we would like to pass to our server actions.
 
 Add the following line of code.
 
@@ -676,10 +687,10 @@ This is how we are setting our `userId` so that we can access it from our `updat
 
 You can read more about it in the Next.js documentation [here](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations#passing-additional-arguments).
 
-Finally, let's use our `useFormState` hook to access the data returned from our server actions.
+Finally, let's use our `useActionState` hook to access the data returned from our server actions.
 
 ```jsx
-const [formState, formAction] = useFormState(
+const [formState, formAction] = useActionState(
   updateProfileWithId,
   INITIAL_STATE
 );
@@ -710,7 +721,7 @@ The final code should look like the following inside your `profile-form.tsx` fil
 import React from "react";
 import { cn } from "@/lib/utils";
 
-import { useFormState } from "react-dom";
+import { useActionState} from "react";
 import { updateProfileAction } from "@/data/actions/profile-actions";
 
 import { SubmitButton } from "@/components/custom/submit-button";
@@ -753,7 +764,7 @@ export function ProfileForm({
 }) {
   const updateProfileWithId = updateProfileAction.bind(null, data.id);
 
-  const [formState, formAction] = useFormState(
+  const [formState, formAction] = useActionState(
     updateProfileWithId,
     INITIAL_STATE
   );
@@ -766,17 +777,17 @@ export function ProfileForm({
             id="username"
             name="username"
             placeholder="Username"
-            defaultValue={data.username || ""}
+            defaultValue={data?.username || ""}
             disabled
           />
           <Input
             id="email"
             name="email"
             placeholder="Email"
-            defaultValue={data.email || ""}
+            defaultValue={data?.email || ""}
             disabled
           />
-          <CountBox text={data.credits} />
+          <CountBox text={data?.credits} />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -784,13 +795,13 @@ export function ProfileForm({
             id="firstName"
             name="firstName"
             placeholder="First Name"
-            defaultValue={data.firstName || ""}
+            defaultValue={data?.firstName || ""}
           />
           <Input
             id="lastName"
             name="lastName"
             placeholder="Last Name"
-            defaultValue={data.lastName || ""}
+            defaultValue={data?.lastName || ""}
           />
         </div>
         <Textarea
@@ -798,7 +809,7 @@ export function ProfileForm({
           name="bio"
           placeholder="Write your bio here..."
           className="resize-none border rounded-md w-full h-[224px] p-2"
-          defaultValue={data.bio || ""}
+          defaultValue={data?.bio || ""}
           required
         />
       </div>
@@ -865,12 +876,13 @@ Here, we are just using fetch to submit our data, but to make it more flexible a
 
 Let's use it on our `profile-actions.ts` file.
 
-Let's make the following change.
+Let's make the following update.
 
 ```tsx
 "use server";
 import qs from "qs";
 import { mutateData } from "@/data/services/mutate-data";
+import { revalidatePath } from "next/cache";
 
 export async function updateProfileAction(
   userId: string,
@@ -907,9 +919,11 @@ export async function updateProfileAction(
     return {
       ...prevState,
       strapiErrors: responseData.error,
-      message: "Failed to Register.",
+      message: "Failed to Update Profile.",
     };
   }
+
+  revalidatePath("/dashboard/account");
 
   return {
     ...prevState,
@@ -917,8 +931,13 @@ export async function updateProfileAction(
     data: responseData,
     strapiErrors: null,
   };
+
 }
 ```
+
+We will be using `revalidatePath` to clear the cache and fetch the latest data from Strapi.
+
+Read more about `revalidatePath` [here](https://nextjs.org/docs/app/api-reference/functions/revalidatePath).
 
 Now, try to update your form, and you will get the `forbidden` message.
 
@@ -926,7 +945,7 @@ Now, try to update your form, and you will get the `forbidden` message.
 
 In order for this to work, we need to grant permission to make the changes in Strapi's Admin.
 
-![011-add-user-permission.png](../images//05-epic-next/011_add_user_permission.png)
+![011_add_user_permission.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/011_add_user_permission_fb110264ab.png)
 
 **note:** One thing to remember is that you should take an additional step to protect your **User** route by creating an additional `policy` that will only allow you to update your user data.
 
@@ -934,7 +953,7 @@ We will cover this as a supplement after we complete this series.
 
 Let's try to update our profile and see if it works.
 
-![012-form-update.gif](../images/05-epic-next/012-form-update.gif)
+![012-form-update.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/012_form_update_8c57fbbecf.gif)
 
 Now that we can update our profile. Let's take a look at how we can upload files in Next.js.
 
@@ -1047,7 +1066,7 @@ Navigate to `src/components/forms`, create a file called `profile-image-form.tsx
 ```tsx
 "use client";
 import React from "react";
-// import { useFormState } from "react-dom";
+// import { useActionState} from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -1083,7 +1102,7 @@ export function ProfileImageForm({
   //   data?.id
   // );
 
-  // const [formState, formAction] = useFormState(
+  // const [formState, formAction] = useActionState(
   //   uploadProfileImageWithIdAction,
   //   initialState
   // );
@@ -1097,8 +1116,8 @@ export function ProfileImageForm({
           label="Profile Image"
           defaultValue={data?.url || ""}
         />
-        {/* <ZodErrors error={formState.zodErrors?.image} />
-        <StrapiErrors error={formState.strapiErrors} /> */}
+        {/* <ZodErrors error={formState?.zodErrors?.image} />
+        <StrapiErrors error={formState?.strapiErrors} /> */}
       </div>
       <div className="flex justify-end">
         <SubmitButton text="Update Image" loadingText="Saving Image" />
@@ -1139,11 +1158,11 @@ Now, let's checkout out our account page and see if we see our image picker?
 
 Nice. Now let's add the `image` field to our user collection type in Strapi Admin.
 
-![013-add-image.png](../images/05-epic-next/013-add-image.png)
+![013-add-image.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/013_add_image_45dbdc191a.png)
 
 Navigate to Content Type Builder, click on the User collection type, and click on the Add Another Field to This Collection button.
 
-![014-select-media.png](../images/05-epic-next/014-select-media.png)
+![014-select-media.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/014_select_media_dec628aa01.png)
 
 Select the `media` field.
 
@@ -1151,11 +1170,11 @@ Make sure to name it `image`, select the `Single media` option, and then navigat
 
 In the advanced settings tabs, configure `allowed file types` only to include images. Once you've done this, click the `Finish` button.
 
-![016-select-type.png](../images/05-epic-next/016-select-type.png)
+![016-select-type.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/016_select_type_df91c4f0e2.png)
 
 Now, add an image to your user.
 
-![017-upload-image.png](../images/05-epic-next/017-upload-image.png)
+![017-upload-image.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/017_upload_image_9c757db2ba.png)
 
 Finally, before we move on, we need to update our `get-user-me-loader.ts` file to include the `image` field in the `populate` query.
 
@@ -1197,7 +1216,6 @@ export async function getUserMeLoader() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${authToken}`,
       },
-      cache: "no-cache",
     });
     const data = await response.json();
     if (data.error) return { ok: false, data: null, error: data.error };
@@ -1211,7 +1229,7 @@ export async function getUserMeLoader() {
 
 Now refresh your frontend application; you should now see your newly added user image.
 
-![018-user-image.png](../images/05-epic-next/018-user-image.png)
+![018-user-image.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/018_user_image_6d61c78086.png)
 
 Let's now create our server action to handle file upload.
 
@@ -1223,6 +1241,7 @@ Let's navigate to `profile-actions.ts` and update the file with the following co
 "use server";
 import { z } from "zod";
 import qs from "qs";
+import { revalidatePath } from "next/cache";
 
 import { getUserMeLoader } from "@/data/services/get-user-me-loader";
 import { mutateData } from "@/data/services/mutate-data";
@@ -1267,9 +1286,11 @@ export async function updateProfileAction(
     return {
       ...prevState,
       strapiErrors: responseData.error,
-      message: "Failed to Register.",
+      message: "Failed to Update Profile.",
     };
   }
+
+  revalidatePath("/dashboard/account");
 
   return {
     ...prevState,
@@ -1378,6 +1399,8 @@ export async function uploadProfileImageAction(
     payload
   );
 
+  revalidatePath("/dashboard/account");
+
   return {
     ...prevState,
     data: updateImageResponse,
@@ -1483,7 +1506,7 @@ The following code should look like the code below.
 ```tsx
 "use client";
 import React from "react";
-import { useFormState } from "react-dom";
+import { useActionState} from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -1519,7 +1542,7 @@ export function ProfileImageForm({
     data?.id
   );
 
-  const [formState, formAction] = useFormState(
+  const [formState, formAction] = useActionState(
     uploadProfileImageWithIdAction,
     initialState
   );
@@ -1533,8 +1556,8 @@ export function ProfileImageForm({
           label="Profile Image"
           defaultValue={data?.url || ""}
         />
-        <ZodErrors error={formState.zodErrors?.image} />
-        <StrapiErrors error={formState.strapiErrors} />
+        <ZodErrors error={formState?.zodErrors?.image} />
+        <StrapiErrors error={formState?.strapiErrors} />
       </div>
       <div className="flex justify-end">
         <SubmitButton text="Update Image" loadingText="Saving Image" />
@@ -1550,11 +1573,11 @@ These options are under `Settings` => `USERS & PERMISSIONS PLUGIN` => `Roles` =>
 
 Check both `upload` and `destroy` boxes.
 
-![019-upload.png](../images/05-epic-next/019-upload.png)
+![019-upload.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/019_upload_358c14b6e3.png)
 
 Let's test out our upload functionality.
 
-![20-test-upload.gif](../images/05-epic-next/20-test-upload.gif)
+![20-test-upload.gif.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/20_test_upload_gif_96ca0c3e51.gif)
 
 Excellent, we now have our file upload working.
 

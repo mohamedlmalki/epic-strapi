@@ -65,7 +65,7 @@ The main benefits of using Strapi include its flexibility, as it allows develope
 
 It also supports many databases and can be easily integrated with popular front-end frameworks like React, Vue, and Angular.
 
-In our case, we will be using Next.js 14.
+In our case, we will be using Next.js 15.
 
 Strapi is designed to streamline the content management process, making it easier for developers and content creators to work efficiently.
 
@@ -161,7 +161,7 @@ So let's get started.
 
 ## Setting Up Our Initial Project
 
-Let's start by setting up our front end first. For this, we will be using [Next.js 14](https://nextjs.org)
+Let's start by setting up our front end first. For this, we will be using [Next.js 15](https://nextjs.org)
 
 ### Setting Up Our Frontend
 
@@ -198,7 +198,7 @@ Once your project has been created, let's navigate to our frontend folder with `
 
 Your project will start at [http://localhost:3000](http://localhost:3000).
 
-![next-js-web.png](/images/01-epic-next/next-js-web.png)
+![next-js-web.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/next_js_web_e06505728d.png)
 
 ### Setting Up Shadcn UI for styling
 
@@ -248,7 +248,7 @@ That's it. We now have Shadcn UI installed and ready to go.
 
 You will see the new `utils` folder and `components.json` file.
 
-![component-file.png](/images/01-epic-next/component-file.png)
+![component-file.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/component_file_f0e96d2043.png)
 
 Let's add our first component by running the following command in your `frontend` folder, which will install our button component.
 
@@ -343,8 +343,8 @@ Once everything gets installed, you will be greeted by Strapi's register page.
 
 Go ahead and create your first **admin user**. Once done, you will be greeted by the dashboard.
 
-![strapi-dashboard.png](/images/01-epic-next/strapi-dashboard.png)
 
+![strapi-dashboard.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/strapi_dashboard_63644bbe24.png)
 Congratulations. We now have our Strapi app set up.
 
 In future posts, we will explore the Strapi dashboard in more detail. But for now, let's create our first **collection type**.
@@ -365,8 +365,7 @@ Let's start by navigating to `Content-Type Builder` under `SINGLE TYPES` and cli
 
 We are going to name it `Home Page`.
 
-![single-type.gif](/images/01-epic-next/single-type.gif)
-
+![single-type.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/single_type_15c76502c6.gif)
 We will add to text fields.
 
 Text -> Short Text -> Title
@@ -376,7 +375,7 @@ Once done, click save.
 
 Now, let's add some basic data.
 
-![adding-data.gif](/images/01-epic-next/adding-data.gif)
+![adding-data.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/adding_data_c5bbbd0b85.gif)
 
 After adding the title text and description, make sure to click publish.
 
@@ -392,7 +391,7 @@ But first, we must give Strapi permission to serve those endpoints to our client
 
 Since this is public data, we can accomplish this with the following permissions.
 
-![giving-public-access.gif](/images/01-epic-next/giving-public-access.gif)
+![giving-public-access.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/giving_public_access_3a430b89d8.gif)
 
 Navigate to Settings -> USERS & PERMISSION PLUGIN -> Roles -> Public
 
@@ -402,7 +401,7 @@ We should now be able to access our data by making a `GET` request to `http://lo
 
 Let's give it a try.
 
-![home-page-data.png](/images/01-epic-next/home-page-data.png)
+![home-page-data.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/home_page_data_964b688c74.png)
 
 Awesome. We must get our initial **Home Page** data from our endpoint.
 
@@ -434,7 +433,7 @@ Before we go, let's call from our front end and see if we can render our initial
 
 Let's see our Next.js and Strapi integration by creating create a basic function to fetch our data inside our Next.js application.
 
-Since we are using Next.js 14, we can use RSC [React Server Components].
+Since we are using Next.js 15, we can use RSC [React Server Components].
 
 Inside our **frontend project**, let's navigate to the `src/app/page.tsx` file.
 
@@ -480,7 +479,7 @@ We will continue building the home page, navigation, and footer in the next post
 
 ## Conclusion
 
-Amazing job, everyone. We did it, we now have our Next.js and Strapi integration. We have jump-started our Next.js 14 and Strapi journey.
+Amazing job, everyone. We did it, we now have our Next.js and Strapi integration. We have jump-started our Next.js 15 and Strapi journey.
 
 We set up both our frontend and backend of our video summarization app. We are now ready to continue building the rest of the project.
 

@@ -46,7 +46,7 @@ So, let's jump into our Strapi Admin and create our Hero Component.
 
 Let's start by navigating to `Content-Type Builder` under `COMPONENTS` and clicking on `Create new component.`
 
-![03-create-first-component.gif](/images/02-epic-next/03-create-first-component.gif)
+![03-create-first-component.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/03_create_first_component_06d8722c97.gif)
 
 We will create the following fields.
 
@@ -56,13 +56,13 @@ Text -> Long Text - subHeading
 
 Note: Change it to only allow images for media in advanced settings.
 
-![04-create-hero-section.gif](/images/02-epic-next/04-create-hero-section.gif)
+![04-create-hero-section.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/04_create_hero_section_9a65da94e5.gif)
 
 For our link, we will create a component that we can reuse.
 
 Go ahead and create a new component called **Link** and save it under **components**.
 
-![05-create-link-component.gif](/images/02-epic-next/05-create-link-component.gif)
+![05-create-link-component.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/05_create_link_component_a3330803f5.gif)
 
 Our Link component will have the following fields.
 Text -> Short Text -> url
@@ -73,19 +73,19 @@ Note: for isExternal in the advanced setting, change the default value to be set
 
 Let's go ahead and add them now.
 
-![06-adding-link-fields.gif](/images/02-epic-next/06-adding-link-fields.gif)
+![06-adding-link-fields.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/06_adding_link_fields_4b6a50961b.gif)
 
 Finally, please return to our **Hero Section** component and add our newly created **Link** component.
 
-![07-adding-link-component.gif](/images/02-epic-next/07-adding-link-component.gif)
+![07-adding-link-component.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/07_adding_link_component_ff776212eb.gif)
 
 The completed fields in our **Hero Section** component should look like the following:
 
-![08-hero-section-fields.png](/images/02-epic-next/08-hero-section-fields.png)
+![08-hero-section-fields.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/08_hero_section_fields_e2daef52e3.png)
 
 Finally, let's add our newly created component to our **Home Page** via dynamic zones.
 
-![09-add-hero-to-home-page.gif](/images/02-epic-next/09-add-hero-to-home-page.gif)
+![09-add-hero-to-home-page.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/09_add_hero_to_home_page_60238e06f7.gif)
 
 We can accomplish this by going to `Content-Type Builder,` selecting the **Home Page** under `SINGLE TYPES` and clicking on `Add another field to this single type.`
 
@@ -101,17 +101,17 @@ Before creating our **Features Section** component, let's see if we can get our 
 
 First, let's add some data.
 
-![10-adding-data-home-page.gif](/images/02-epic-next/10-adding-data-home-page.gif)
+![10-adding-data-home-page.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/10_adding_data_home_page_cdfaa659c8.gif)
 
 Now make sure that we have proper permission in the **Settings**
 
-![11-permissions.png](/images/02-epic-next/11-permissions.png)
+![11-permissions.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/11_permissions_c9fa5b3b05.png)
 
 Now, let's test our API call in **Postman**. But before we do, we need to specify in Strapi all the items we would like to populate.
 
 Looking at our content, we need to populate the following items: `blocks,` `image,` and `link.`
 
-![12-home-populate.png](/images/02-epic-next/12-home-populate.png)
+![12-home-populate.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/12_home_populate_2a3a7da53e.png)
 
 Before we construct our query, quick note, as of Strapi 5, we need to use the `on` flag to populate our dynamic zones data.
 
@@ -145,14 +145,14 @@ We can populate our data with the following query.
 
 Using the query builder, the following LHS syntax query will be generated.
 
-![13-home-query.png](/images/02-epic-next/13-home-query.png)
+![13-home-query.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/13_home_query_9dc813229d.png)
 
 `http://localhost:1337/api/home-page?populate[blocks][on][layout.hero-section][populate][image][fields][0]=url&populate[blocks][on][layout.hero-section][populate][image][fields][1]=alternativeText&populate[blocks][on][layout.hero-section][populate][link][populate]=true`
 
 
 Here is the [complete URL](http://localhost:1337/api/home-page?populate[blocks][on][layout.hero-section][populate][image][fields][0]=url&populate[blocks][on][layout.hero-section][populate][image][fields][1]=alternativeText&populate[blocks][on][layout.hero-section][populate][link][populate]=true)
 
-![14-postman-request.png](/images/02-epic-next/14-postman-request.png)
+![14-postman-request.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/14_postman_request_526ceee848.png)
 
 We will get the following data after making a `GET` request in **Postman**.
 
@@ -752,7 +752,8 @@ export function HeroSection({ data }: { readonly data: HeroSectionProps }) {
 
 We are now getting and displaying our data from Strapi but here are still more improvements that we must make in this component.
 
-![17-hero-section-component.png](https://api-prod.strapi.io/uploads/17_hero_section_component_891518b50c.png)
+![15-hero-section.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/15_hero_section_b73c621ad7.png)
+
 
 Like to use Next **Image** and not have to hard code "http://localhost:1337" path that we append to our image url but instead should get it from our `.env` variable.
 
@@ -769,8 +770,6 @@ Finish up our **Hero Section** and start working on our **Features Section**.
 I hope you are enjoying this series so far. Thank you for your time, and I will see you in the next one.
 
 You can find the code in the following repo [here](https://github.com/PaulBratslavsky/epic-next-course/tree/02-epic-next).
-
-
 
 
 
