@@ -815,3 +815,21 @@ Here’s a quick summary of everything we covered:
 This setup combines Strapi’s middleware with Next.js to create a simple and secure app that works well even as more users join. Now, each user has a clear view of their own data, and we’re keeping everything safe by preventing unauthorized access.
 
 In the next part, we’ll keep building out new features to make this app even better. Thanks for following along, and happy coding! See you in the next tutorial!
+
+### Note about this project
+
+This project has been updated to use Next.js 15 and Strapi 5.
+
+If you have any questions, feel free to stop by at our [Discord Community](https://discord.com/invite/strapi) for our daily "open office hours" from 12:30 PM CST to 1:30 PM CST.
+
+If you have a suggestion or find a mistake in the post, please open an issue on the [GitHub repository](https://github.com/PaulBratslavsky/epic-next-15-strapi-5).
+
+You can also find the blog post content in the [Strapi Blog](https://github.com/PaulBratslavsky/epic-next-15-strapi-5/tree/main/blog/blog-posts).
+
+Fell free to make PRs to fix any issues you find in the project or let me know if you have any questions.
+
+Happy coding!
+
+- Paul
+
+

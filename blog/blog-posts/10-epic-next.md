@@ -543,3 +543,20 @@ But with that being said, thank you so much for your time. This tutorial/video s
 Even though this is the end of this series, as I discover new cool things around Next.js and Strapi, I will create follow-up content and updates. Also, I will move this repo to Strapi's GitHub. It will be open-source, so anyone can help us improve or use it as a starting point for a new project. I will add the link here once I am done.
 
 Thank you. If you want to share your feedback, good or bad, you can find me hanging out in Strapi's "open office" Monday through Friday at 12:30 PM CST. You can also join us via [Discord](https://discord.com/invite/strapi).
+
+### Note about this project
+
+This project has been updated to use Next.js 15 and Strapi 5.
+
+If you have any questions, feel free to stop by at our [Discord Community](https://discord.com/invite/strapi) for our daily "open office hours" from 12:30 PM CST to 1:30 PM CST.
+
+If you have a suggestion or find a mistake in the post, please open an issue on the [GitHub repository](https://github.com/PaulBratslavsky/epic-next-15-strapi-5).
+
+You can also find the blog post content in the [Strapi Blog](https://github.com/PaulBratslavsky/epic-next-15-strapi-5/tree/main/blog/blog-posts).
+
+Fell free to make PRs to fix any issues you find in the project or let me know if you have any questions.
+
+Happy coding!
+
+- Paul
+

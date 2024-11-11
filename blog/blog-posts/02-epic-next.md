@@ -769,7 +769,19 @@ Finish up our **Hero Section** and start working on our **Features Section**.
 
 I hope you are enjoying this series so far. Thank you for your time, and I will see you in the next one.
 
-You can find the code in the following repo [here](https://github.com/PaulBratslavsky/epic-next-course/tree/02-epic-next).
+### Note about this project
 
+This project has been updated to use Next.js 15 and Strapi 5.
 
+If you have any questions, feel free to stop by at our [Discord Community](https://discord.com/invite/strapi) for our daily "open office hours" from 12:30 PM CST to 1:30 PM CST.
+
+If you have a suggestion or find a mistake in the post, please open an issue on the [GitHub repository](https://github.com/PaulBratslavsky/epic-next-15-strapi-5).
+
+You can also find the blog post content in the [Strapi Blog](https://github.com/PaulBratslavsky/epic-next-15-strapi-5/tree/main/blog/blog-posts).
+
+Fell free to make PRs to fix any issues you find in the project or let me know if you have any questions.
+
+Happy coding!
+
+- Paul
 
