@@ -84,13 +84,13 @@ yarn dev
 ```
 
 ```bash
-➜  frontend git:(main) ✗ yarn dev
- ▲ Next.js 14.2.14
-  - Local:        http://localhost:3000
-  - Environments: .env.local
+$ next dev
+   ▲ Next.js 15.0.3
+   - Local:        http://localhost:3000
+   - Environments: .env.local
 
  ✓ Starting...
- ✓ Ready in 1548ms
+ ✓ Ready in 1841ms
 
 ```
 

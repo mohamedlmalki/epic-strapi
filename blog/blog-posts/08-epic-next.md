@@ -1,4 +1,3 @@
-
 We are making amazing progress. We are now in the final stretch. In this section, we will look at Search and Pagination.
 
 - [Part 1: Learn Next.js by building a website](https://strapi.io/blog/epic-next-js-14-tutorial-learn-next-js-by-building-a-real-life-project-part-1-2)
@@ -12,10 +11,9 @@ We are making amazing progress. We are now in the final stretch. In this section
 - [Part 9: Backend deployment to Strapi Cloud](https://strapi.io/blog/epic-next-js-14-tutorial-part-9-backend-deployment-to-strapi-cloud)
 - [Part 10: Frontend deployment to Vercel](https://strapi.io/blog/epic-next-js-14-tutorial-part-10-frontend-deployment-to-vercel)
 
-
 ![001-search-pagination.png](https://api-prod.strapi.io/uploads/001_search_pagination_8f67ded833.png)
 
-## How To Handle Search In Next.js 
+## How To Handle Search In Next.js
 
 Let's jump in and look at how to implement search with Next.js and Strapi CMS.
 
@@ -61,17 +59,17 @@ export function Search() {
 
 The secret to understanding how our **Search** component works is to be familiar with the following hooks from Next.js.
 
-* **`useSearchParams`** [docs reference](https://nextjs.org/docs/app/api-reference/functions/use-search-params) It is a Client Component hook that lets you read the current URL's query string.
+- **`useSearchParams`** [docs reference](https://nextjs.org/docs/app/api-reference/functions/use-search-params) It is a Client Component hook that lets you read the current URL's query string.
 
 We use it in our code to get our current parameters from our url.
 
 Then, we use the new `URLSearchParams` to update our search parameters. You can learn more about it [here](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams).
 
-* **`useRouter`** [docs reference](https://nextjs.org/docs/pages/api-reference/functions/use-router) : Allows us to access the router object inside any function component in your app. We will use the replace method to prevent adding a new URL entry into the history stack.
+- **`useRouter`** [docs reference](https://nextjs.org/docs/pages/api-reference/functions/use-router) : Allows us to access the router object inside any function component in your app. We will use the replace method to prevent adding a new URL entry into the history stack.
 
-* **`usePathname`** [docs reference](https://nextjs.org/docs/app/api-reference/functions/use-pathname): This is a Client Component hook that lets you read the current URL's pathname. We use it to find our current path before concatenating our new search parameters.
+- **`usePathname`** [docs reference](https://nextjs.org/docs/app/api-reference/functions/use-pathname): This is a Client Component hook that lets you read the current URL's pathname. We use it to find our current path before concatenating our new search parameters.
 
-* **`useDebouncedCallback`** [npm reference](https://www.npmjs.com/package/use-debounce): Used to prevent making an api call on every keystroke when using our Search component.
+- **`useDebouncedCallback`** [npm reference](https://www.npmjs.com/package/use-debounce): Used to prevent making an api call on every keystroke when using our Search component.
 
 Install the `use-debounce` package from [npm](https://www.npmjs.com/package/use-debounce) with the following command.
 
@@ -125,6 +123,7 @@ Navigate to the `src/app/dashboard/summaries/page.tsx` file and update it with t
 ```tsx
 import Link from "next/link";
 import { getSummaries } from "@/data/loaders";
+import ReactMarkdown from "react-markdown";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search } from "@/components/custom/search";
@@ -145,9 +144,17 @@ function LinkCard({ documentId, title, summary }: Readonly<LinkCardProps>) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="w-full mb-4 leading-7">
+          <ReactMarkdown
+            className="card-markdown prose prose-sm max-w-none
+              prose-headings:text-gray-900 prose-headings:font-semibold
+              prose-p:text-gray-600 prose-p:leading-relaxed
+              prose-a:text-pink-500 prose-a:no-underline hover:prose-a:underline
+              prose-strong:text-gray-900 prose-strong:font-semibold
+              prose-ul:list-disc prose-ul:pl-4
+              prose-ol:list-decimal prose-ol:pl-4"
+          >
             {summary.slice(0, 164) + " [read more]"}
-          </p>
+          </ReactMarkdown>
         </CardContent>
       </Card>
     </Link>
@@ -162,15 +169,16 @@ interface SearchParamsProps {
 
 export default async function SummariesRoute({
   searchParams,
-}: Readonly<SearchParamsProps>) {
+}: SearchParamsProps) {
+  const search = await searchParams;
+  const query = search?.query ?? "";
+  console.log(query);
   const { data } = await getSummaries();
-  // this will gran our search params from the URL that we will pass to our getSummaries function
-  const query = searchParams?.query ?? "";
+
   if (!data) return null;
   return (
     <div className="grid grid-cols-1 gap-4 p-4">
       <Search />
-      <span>Query: {query}</span>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {data.map((item: LinkCardProps) => (
           <LinkCard key={item.documentId} {...item} />
@@ -179,18 +187,17 @@ export default async function SummariesRoute({
     </div>
   );
 }
-
 ```
 
 ![002-search-component.gif](https://api-prod.strapi.io/uploads/002_search_component_1acc5e3645.gif)
 
-Excellent. Now that our `Search` component works, let's move on to the second part. We'll pass our query search through our `getSummaries` function and update it accordingly to allow us to search our queries.
+Excellent. Now that our `Search` component shows up, let's move on to the second part. We'll pass our query search through our `getSummaries` function and update it accordingly to allow us to search our queries.
 
 To make the search work, we will rely on the following parameters.
 
-* **sorting**: we will sort all of our summaries in descending order, ensuring that the newest summary appears first.
+- **sorting**: we will sort all of our summaries in descending order, ensuring that the newest summary appears first.
 
-* **filters**: The filters we will use `$or` operator to combine our search conditions. This means the search will return summaries based on the fields we will filter using `$containsi,` which will ignore case sensitivity.
+- **filters**: The filters we will use `$or` operator to combine our search conditions. This means the search will return summaries based on the fields we will filter using `$containsi,` which will ignore case sensitivity.
 
 Let's look inside our `src/data/loaders.ts` file and update the following code inside our `getSummaries` function.
 
@@ -421,7 +428,7 @@ Notice that we have our `pageCount` property. We will use it to tell our **`Pagi
 So, let's extract it from our `meta` data with the following.
 
 ```tsx
-const pageCount = meta.pagination.pageCount;
+  const pageCount = meta?.pagination?.pageCount;
 ```
 
 And finally, let's use our **`PaginationComponent`** with the following.
@@ -435,6 +442,7 @@ The completed code should look like the following.
 ```tsx
 import Link from "next/link";
 import { getSummaries } from "@/data/loaders";
+import ReactMarkdown from "react-markdown";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search } from "@/components/custom/search";
@@ -456,9 +464,17 @@ function LinkCard({ documentId, title, summary }: Readonly<LinkCardProps>) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="w-full mb-4 leading-7">
+          <ReactMarkdown 
+            className="card-markdown prose prose-sm max-w-none
+              prose-headings:text-gray-900 prose-headings:font-semibold
+              prose-p:text-gray-600 prose-p:leading-relaxed
+              prose-a:text-pink-500 prose-a:no-underline hover:prose-a:underline
+              prose-strong:text-gray-900 prose-strong:font-semibold
+              prose-ul:list-disc prose-ul:pl-4
+              prose-ol:list-decimal prose-ol:pl-4"
+          >
             {summary.slice(0, 164) + " [read more]"}
-          </p>
+          </ReactMarkdown>
         </CardContent>
       </Card>
     </Link>
@@ -472,21 +488,21 @@ interface SearchParamsProps {
   };
 }
 
-export default async function SummariesRoute({
-  searchParams,
-}: Readonly<SearchParamsProps>) {
-  // this will gran our search params from the URL that we will pass to our getSummaries function
-  const query = searchParams?.query ?? "";
-  const currentPage = Number(searchParams?.page) || 1;
+
+export default async function SummariesRoute({ searchParams }: SearchParamsProps) {
+  const search = await searchParams;
+  const query = search?.query ?? ""; 
+  const currentPage = Number(search?.page) || 1;
 
   const { data, meta } = await getSummaries(query, currentPage);
-  const pageCount = meta.pagination.pageCount;
+  const pageCount = meta?.pagination?.pageCount;
+
+  console.log(meta);  
 
   if (!data) return null;
   return (
     <div className="grid grid-cols-1 gap-4 p-4">
       <Search />
-      <span>Query: {query}</span>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {data.map((item: LinkCardProps) => (
           <LinkCard key={item.documentId} {...item} />
@@ -496,7 +512,6 @@ export default async function SummariesRoute({
     </div>
   );
 }
-
 ```
 
 Now, the moment of truth: Let's see if it works. Make sure you add more summaries since our page size is currently set to 4 items. You need to have at least 5 items.

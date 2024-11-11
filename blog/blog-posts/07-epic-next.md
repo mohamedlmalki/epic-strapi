@@ -15,7 +15,7 @@ Last time, we learned how to generate summaries using OpenAI and save them into 
 
 ![001-summary.png](https://api-prod.strapi.io/uploads/001_summary_5cefccc98e.png)
 
-Today, we'll take a look at how to update and delete our summaries while ensuring that only an authorized user can do this, as well as how to inject custom middleware on to `users-permission` plugin to allow users to update only their bio.
+Today, we'll take a look at how to update and delete our summaries while ensuring that only an authorized user can do this.
 
 We must ensure that only the right people can change or delete information.
 
@@ -87,10 +87,10 @@ You should see the following code that we added in the previous tutorial.
 
 ```tsx
 // import { updateSummaryAction, deleteSummaryAction } from "@/data/actions/summary-actions";
+import { cn } from "@/lib/utils";
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
 
 import {
   Card,
@@ -100,8 +100,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { SubmitButton } from "@/components/custom/submit-button";
-import { DeleteButton } from "@/components/custom/delete-button";
+import ReactMarkdown from "react-markdown";
+// import { DeleteButton } from "@/components/custom/delete-button";
 
 export function SummaryCardForm({
   item,
@@ -128,11 +131,67 @@ export function SummaryCardForm({
               className="mb-4"
               defaultValue={item.title}
             />
-            <Textarea
-              name="summary"
-              className="flex w-full rounded-md bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:bg-gray-50 focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 mb-4 h-[calc(100vh-245px)]"
-              defaultValue={item.summary}
-            />
+            <div className="flex-1 flex flex-col">
+              <Tabs
+                defaultValue="preview"
+                className="flex flex-col h-full gap-2"
+              >
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="preview">Preview</TabsTrigger>
+                  <TabsTrigger value="markdown">Edit Markdown</TabsTrigger>
+                </TabsList>
+                <TabsContent value="preview" className="flex-1">
+                  <ReactMarkdown
+                    className="
+                    markdown-preview
+                    relative w-full h-[600px]
+                    overflow-auto scroll-smooth
+                    p-4 px-3 py-2
+                    text-sm
+                    bg-white dark:bg-gray-800 bg-transparent
+                    border border-gray-300 dark:border-gray-700
+                    rounded-md
+                    shadow-sm
+                    mb-4
+                    placeholder:text-muted-foreground
+                    focus-visible:outline-none
+                    focus-visible:bg-gray-50
+                    focus-visible:ring-1
+                    focus-visible:ring-ring
+                    disabled:cursor-not-allowed
+                    disabled:opacity-50
+                  "
+                  >
+                    {item.summary}
+                  </ReactMarkdown>
+                </TabsContent>
+                <TabsContent value="markdown" className="flex-1">
+                  <Textarea
+                    name="summary"
+                    className="
+                      markdown-preview
+                      relative w-full h-[600px]
+                      overflow-auto scroll-smooth
+                      p-4 px-3 py-2
+                      text-sm
+                      bg-white dark:bg-gray-800 bg-transparent
+                      border border-gray-300 dark:border-gray-700
+                      rounded-md
+                      shadow-sm
+                      mb-4
+                      placeholder:text-muted-foreground
+                      focus-visible:outline-none
+                      focus-visible:bg-gray-50
+                      focus-visible:ring-1
+                      focus-visible:ring-ring
+                      disabled:cursor-not-allowed
+                      disabled:opacity-50
+                    "
+                    defaultValue={item.summary}
+                  />
+                </TabsContent>
+              </Tabs>
+            </div>
             <input type="hidden" name="id" value={item.documentId} />
             <SubmitButton
               text="Update Summary"
@@ -140,7 +199,7 @@ export function SummaryCardForm({
             />
           </form>
           <form>
-            <DeleteButton className="absolute right-4 top-4 bg-red-700 hover:bg-red-600" />
+            {/* <DeleteButton className="absolute right-4 top-4 bg-red-700 hover:bg-red-600" /> */}
           </form>
         </div>
       </CardContent>
@@ -176,9 +235,7 @@ export async function createSummaryAction(payload: Payload) {
 
   const data = await mutateData("POST", "/api/summaries", payload);
 
-  if (data.error) {
-    throw new Error(data.error.message);
-  }
+  if (data.error) throw new Error(data.error.message);
 
   redirect("/dashboard/summaries/" + data.data.documentId);
 }
@@ -223,8 +280,6 @@ export async function updateSummaryAction(prevState: any, formData: FormData) {
 }
 
 export async function deleteSummaryAction(id: string, prevState: any) {
-  
-
   const responseData = await mutateData("DELETE", `/api/summaries/${id}`);
 
   if (!responseData) {
@@ -237,12 +292,7 @@ export async function deleteSummaryAction(id: string, prevState: any) {
 
   redirect("/dashboard/summaries");
 }
-
 ```
-
-You will notice that we are using `revalidatePath` imported from `next/cache`. You can learn more about it in the Next.js docs [here](https://nextjs.org/docs/app/api-reference/functions/revalidatePath).
-
-After our summary update, this will insure that our data is revalidated after update at the `/dashboard/summaries` path.
 
 Now that we have both server actions to handle update and delete let's navigate back to our `summary-card-form.tsx` file.
 
@@ -258,10 +308,10 @@ import {
 Then, let's import the following to access the form state for error handling.
 
 ```tsx
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
 ```
 
-Don't forget, since we are using `useFormState` we need to add `"use client";` at the top of the file.
+Don't forget, since we are using `useActionState` we need to add `"use client";` at the top of the file.
 
 Now, let's set the default state to the following:
 
@@ -278,18 +328,18 @@ Let's connect our actions with our `formState` by adding the following.
 ```tsx
 const deleteSummaryById = deleteSummaryAction.bind(null, item.id);
 
-const [deleteState, deleteAction] = useFormState(
+const [deleteState, deleteAction] = useActionState(
   deleteSummaryById,
   INITIAL_STATE
 );
 
-const [updateState, updateAction] = useFormState(
+const [updateState, updateAction] = useActionState(
   updateSummaryAction,
   INITIAL_STATE
 );
 ```
 
-Based on what we have already covered, this should all start looking familiar. We are using `useFormState` to get our return from our server actions to display our errors on our frontend.
+Based on what we have already covered, this should all start looking familiar. We are using `useActionState` to get our return from our server actions to display our errors on our frontend.
 
 Now that we have our `deleteAction` and `updateAction,` we must add these to the respectful forms via the action attribute.
 
@@ -303,12 +353,65 @@ Now that we have our `deleteAction` and `updateAction,` we must add these to the
     className="mb-4"
     defaultValue={item.title}
   />
-  <Textarea
-    name="summary"
-    className="flex w-full rounded-md bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:bg-gray-50 focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 mb-4 h-[calc(100vh-245px)] "
-    defaultValue={item.summary}
-  />
-  <input type="hidden" name="id" value={item.id} />
+  <div className="flex-1 flex flex-col">
+    <Tabs defaultValue="preview" className="flex flex-col h-full gap-2">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="preview">Preview</TabsTrigger>
+        <TabsTrigger value="markdown">Edit Markdown</TabsTrigger>
+      </TabsList>
+      <TabsContent value="preview" className="flex-1">
+        <ReactMarkdown
+          className="
+                    markdown-preview
+                    relative w-full h-[600px]
+                    overflow-auto scroll-smooth
+                    p-4 px-3 py-2
+                    text-sm
+                    bg-white dark:bg-gray-800 bg-transparent
+                    border border-gray-300 dark:border-gray-700
+                    rounded-md
+                    shadow-sm
+                    mb-4
+                    placeholder:text-muted-foreground
+                    focus-visible:outline-none
+                    focus-visible:bg-gray-50
+                    focus-visible:ring-1
+                    focus-visible:ring-ring
+                    disabled:cursor-not-allowed
+                    disabled:opacity-50
+                  "
+        >
+          {item.summary}
+        </ReactMarkdown>
+      </TabsContent>
+      <TabsContent value="markdown" className="flex-1">
+        <Textarea
+          name="summary"
+          className="
+                      markdown-preview
+                      relative w-full h-[600px]
+                      overflow-auto scroll-smooth
+                      p-4 px-3 py-2
+                      text-sm
+                      bg-white dark:bg-gray-800 bg-transparent
+                      border border-gray-300 dark:border-gray-700
+                      rounded-md
+                      shadow-sm
+                      mb-4
+                      placeholder:text-muted-foreground
+                      focus-visible:outline-none
+                      focus-visible:bg-gray-50
+                      focus-visible:ring-1
+                      focus-visible:ring-ring
+                      disabled:cursor-not-allowed
+                      disabled:opacity-50
+                    "
+          defaultValue={item.summary}
+        />
+      </TabsContent>
+    </Tabs>
+  </div>
+  <input type="hidden" name="id" value={item.documentId} />
   <SubmitButton text="Update Summary" loadingText="Updating Summary" />
 </form>
 ```
@@ -339,16 +442,18 @@ The completed code should look like the following.
 
 ```tsx
 "use client";
+import { useActionState } from "react";
+
 import {
   updateSummaryAction,
   deleteSummaryAction,
 } from "@/data/actions/summary-actions";
-import { useFormState } from "react-dom";
+import { cn } from "@/lib/utils";
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+
 import { StrapiErrors } from "@/components/custom/strapi-errors";
-import { cn } from "@/lib/utils";
 
 import {
   Card,
@@ -358,7 +463,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { SubmitButton } from "@/components/custom/submit-button";
+import ReactMarkdown from "react-markdown";
 import { DeleteButton } from "@/components/custom/delete-button";
 
 const INITIAL_STATE = {
@@ -376,12 +484,12 @@ export function SummaryCardForm({
 }) {
   const deleteSummaryById = deleteSummaryAction.bind(null, item.documentId);
 
-  const [deleteState, deleteAction] = useFormState(
+  const [deleteState, deleteAction] = useActionState(
     deleteSummaryById,
     INITIAL_STATE
   );
 
-  const [updateState, updateAction] = useFormState(
+  const [updateState, updateAction] = useActionState(
     updateSummaryAction,
     INITIAL_STATE
   );
@@ -401,11 +509,67 @@ export function SummaryCardForm({
               className="mb-4"
               defaultValue={item.title}
             />
-            <Textarea
-              name="summary"
-              className="flex w-full rounded-md bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:bg-gray-50 focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 mb-4 h-[calc(100vh-245px)] "
-              defaultValue={item.summary}
-            />
+            <div className="flex-1 flex flex-col">
+              <Tabs
+                defaultValue="preview"
+                className="flex flex-col h-full gap-2"
+              >
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="preview">Preview</TabsTrigger>
+                  <TabsTrigger value="markdown">Edit Markdown</TabsTrigger>
+                </TabsList>
+                <TabsContent value="preview" className="flex-1">
+                  <ReactMarkdown
+                    className="
+                    markdown-preview
+                    relative w-full h-[600px]
+                    overflow-auto scroll-smooth
+                    p-4 px-3 py-2
+                    text-sm
+                    bg-white dark:bg-gray-800 bg-transparent
+                    border border-gray-300 dark:border-gray-700
+                    rounded-md
+                    shadow-sm
+                    mb-4
+                    placeholder:text-muted-foreground
+                    focus-visible:outline-none
+                    focus-visible:bg-gray-50
+                    focus-visible:ring-1
+                    focus-visible:ring-ring
+                    disabled:cursor-not-allowed
+                    disabled:opacity-50
+                  "
+                  >
+                    {item.summary}
+                  </ReactMarkdown>
+                </TabsContent>
+                <TabsContent value="markdown" className="flex-1">
+                  <Textarea
+                    name="summary"
+                    className="
+                      markdown-preview
+                      relative w-full h-[600px]
+                      overflow-auto scroll-smooth
+                      p-4 px-3 py-2
+                      text-sm
+                      bg-white dark:bg-gray-800 bg-transparent
+                      border border-gray-300 dark:border-gray-700
+                      rounded-md
+                      shadow-sm
+                      mb-4
+                      placeholder:text-muted-foreground
+                      focus-visible:outline-none
+                      focus-visible:bg-gray-50
+                      focus-visible:ring-1
+                      focus-visible:ring-ring
+                      disabled:cursor-not-allowed
+                      disabled:opacity-50
+                    "
+                    defaultValue={item.summary}
+                  />
+                </TabsContent>
+              </Tabs>
+            </div>
             <input type="hidden" name="id" value={item.documentId} />
             <SubmitButton
               text="Update Summary"
@@ -429,7 +593,7 @@ export function SummaryCardForm({
 
 Now, let's test out our frontend. I disabled `delete` and `update` under user permission for authenticated users.
 
-![003-permissions.png](../images/07-epic-next/003-permissions.png)
+![003-permissions.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/003_permissions_80b28bf10b.png)
 
 So, if we try to `delete` or `update` our summary, we should see the `forbidden` message in our card footer.
 
@@ -437,7 +601,7 @@ So, if we try to `delete` or `update` our summary, we should see the `forbidden`
 
 Excellent, we can tell our errors are working. Let's set the following permissions again and see if our update and delete functions work.
 
-![005-change-permissions.png](../images/07-epic-next/005-change-permissions.png)
+![005-change-permissions.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/005_change_permissions_fc805552ad.png)
 
 You should now see that you can update and delete your content.
 
@@ -445,11 +609,11 @@ You should now see that you can update and delete your content.
 
 But we have one small issue. When we make a `GET` request to the `/api/summaries` endpoint, we get all the summaries. And we want to make sure that we only get the summaries for the user that is logged in.
 
-![007-unprotected.png](../images/07-epic-next/007-unprotected.png)
+![007-unprotected.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/007_unprotected_efb610e982.png)
 
 Here in Strapi Admin, you can see that I have two summaries from two different users. Still, in the frontend, you can see that I have access to all the summaries.
 
-![008-I-see-you.png](../images/07-epic-next/008-I-see-you.png)
+![008-I-see-you.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/008_I_see_you_99544f1e72.png)
 
 I should only see the summaries from the user that is logged in. But instead, I see all the summaries.
 
@@ -473,14 +637,14 @@ Select the `middleware` option.
 ➜  backend git:(main) ✗ yarn strapi generate
 yarn run v1.22.22
 $ strapi generate
-? Strapi Generators 
-  api - Generate a basic API 
-  controller - Generate a controller for an API 
-  content-type - Generate a content type for an API 
-  policy - Generate a policy for an API 
-❯ middleware - Generate a middleware for an API 
-  migration - Generate a migration 
-  service - Generate a service for an API 
+? Strapi Generators
+  api - Generate a basic API
+  controller - Generate a controller for an API
+  content-type - Generate a content type for an API
+  policy - Generate a policy for an API
+❯ middleware - Generate a middleware for an API
+  migration - Generate a migration
+  service - Generate a service for an API
 ```
 
 I am going to call my middleware `is-owner` and we will add it to the root of the project.
@@ -488,9 +652,9 @@ I am going to call my middleware `is-owner` and we will add it to the root of th
 ```bash
 ? Middleware name is-owner
 ? Where do you want to add this middleware? (Use arrow keys)
-❯ Add middleware to root of project 
-  Add middleware to an existing API 
-  Add middleware to an existing plugin 
+❯ Add middleware to root of project
+  Add middleware to an existing API
+  Add middleware to an existing plugin
 ```
 
 Select the `Add middleware to root of project` option and press `Enter`.
@@ -509,12 +673,12 @@ It will have this basic template code.
  * `is-owner` middleware
  */
 
-import type { Core } from '@strapi/strapi';
+import type { Core } from "@strapi/strapi";
 
 export default (config, { strapi }: { strapi: Core.Strapi }) => {
   // Add your own logic here.
   return async (ctx, next) => {
-    strapi.log.info('In is-owner middleware.');
+    strapi.log.info("In is-owner middleware.");
 
     await next();
   };
@@ -595,7 +759,6 @@ export default factories.createCoreRouter("api::summary.summary", {
     },
   },
 });
-
 ```
 
 We have already added middleware to our `create` route. Let's do the same for `find`, `findOne`, `update`, and `delete`.
@@ -628,14 +791,13 @@ export default factories.createCoreRouter("api::summary.summary", {
     },
   },
 });
-
 ```
 
 Whenever any of these routes get called, it will trigger our middleware that will either reject the request or approve it based on our logic.
 
 Let's restart our Strapi backend and see if we are only able to see the post for the appropriate user.
 
-![009-works.gif](../images/07-epic-next/009-works.gif)
+![009-works.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/009_works_598641fe68.gif)
 
 ## Conclusion
 
@@ -653,5 +815,3 @@ Here’s a quick summary of everything we covered:
 This setup combines Strapi’s middleware with Next.js to create a simple and secure app that works well even as more users join. Now, each user has a clear view of their own data, and we’re keeping everything safe by preventing unauthorized access.
 
 In the next part, we’ll keep building out new features to make this app even better. Thanks for following along, and happy coding! See you in the next tutorial!
-
-

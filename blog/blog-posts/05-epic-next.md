@@ -13,7 +13,7 @@ In the previous tutorial, we finished our **Home Page**, so we will build out ou
 
 Welcome to the next part of our React tutorial with Next.js. In the last post, we finished our Signup & Signin Page with authentication using **HTTPOnly** cookies and saw how to protect our routes via Next.js middleware.
 
-In this section, we will be working on completing our **Dashboard** and **Profile Page**, where we will look at uploading files using NextJs server actions. At the end of the tutorial, you should be able to perform any file upload, handling of forms and server actions in Next.Js 14.
+In this section, we will be working on completing our **Dashboard** and **Profile Page**, where we will look at uploading files using NextJs server actions. At the end of the tutorial, you should be able to perform any file upload, handling of forms and server actions in Next.Js 15.
 
 Currently, our **Dashboard** Page looks like the following. Let's create a `layout.tsx` page to give our page shared styling.
 
@@ -665,7 +665,7 @@ const INITIAL_STATE = {
 };
 ```
 
-I will not focus on form validation with **Zod** since we already covered this in previous sections. It can be a great extra challenge for you to explore independently and to see how useful it is for data validation in JavaScript/TypeScript applications and frameworks such as Next.JS 14, VueJs, Remix, etc.
+I will not focus on form validation with **Zod** since we already covered this in previous sections. It can be a great extra challenge for you to explore independently and to see how useful it is for data validation in JavaScript/TypeScript applications and frameworks such as Next.JS 15, VueJs, Remix, etc.
 
 But we will import our **StrapiErrors** component and handle those.
 
@@ -863,7 +863,12 @@ export async function mutateData(method: string, path: string, payload?: any) {
       },
       body: JSON.stringify({ ...payload }),
     });
-    const data = await response.json();
+
+    if (method === 'DELETE') {
+      return response.ok;
+    }
+
+    const data = await response?.json();
     return data;
   } catch (error) {
     console.log("error", error);

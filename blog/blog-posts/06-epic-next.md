@@ -155,9 +155,9 @@ Let's restart our frontend project and see if it shows up.
 
 ![002-toast-and-form.gif](https://api-prod.strapi.io/uploads/002_toast_and_form_2bbc55bf42.gif)
 
-Now that our basic form is working let's examine how to set up our first API Handler Route in Next.Js 14.
+Now that our basic form is working let's examine how to set up our first API Handler Route in Next.js 15.
 
-## How To Create A Route Handler in Next.Js 14
+## How To Create A Route Handler in Next.js 15
 
 We will have the Next.js [docs](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) open as a reference.
 
@@ -646,7 +646,7 @@ Now, let's test our form. Make sure to provide a valid YouTube video ID or URL a
 
 Excellent, it is working. Now, we are ready to implement our logic to get our summary. Let's do it.
 
-### Generate Summary with LangChain and OpenAI in Next.Js 14
+### Generate Summary with LangChain and OpenAI in Next.js 15
 
 Now, let's write our logic to handle the generation of our summary with OpenAi and LangChain.
 
@@ -1294,22 +1294,51 @@ export default async function SummaryCardRoute({
 
 The above code will give us a warning in Next 15.
 
-``` bash
+```bash
 Error: Route "/dashboard/summaries/[videoId]" used `params.videoId`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
 ```
 
 [You can read more about it here](https://nextjs.org/docs/messages/sync-dynamic-apis#why-this-warning-occurred)
 
-Let's run the following command to fix it.
+Let's run the following command to fix it. Just make sure you save or stash all your changes.
 
 ```bash
 npx @next/codemod@canary next-async-request-api
 ```
 
+```bash
+➜  frontend git:(main) npx @next/codemod@canary next-async-request-api
+✔ On which files or directory should the codemods be applied? … .
+Executing command: jscodeshift --no-babel --ignore-pattern=**/node_modules/** --ignore-pattern=**/.next/** --extensions=tsx,ts,jsx,js --transform /Users/paulbratslavsky/.npm/_npx/6a090669e21b4303/node_modules/@next/codemod/transforms/next-async-request-api.js .
+Processing 53 files...
+Spawning 7 workers...
+Sending 8 files to free worker...
+Sending 8 files to free worker...
+Sending 8 files to free worker...
+Sending 8 files to free worker...
+Sending 8 files to free worker...
+Sending 8 files to free worker...
+Sending 5 files to free worker...
+All done.
+Results:
+0 errors
+52 unmodified
+0 skipped
+1 ok
+Time elapsed: 0.479seconds
+```
+
 and refactor the code to the following.
 
 ```tsx
+export default async function SummaryCardRoute(props: Readonly<ParamsProps>) {
+  const params = await props?.params;
+  const { videoId } = params;
+  return <p>Summary card with go here: {videoId}</p>;
+}
 ```
+
+Now the warning should be gone. Let's continue.
 
 Now when you click on the summary card, you should be navigated to the single summary view and see our placeholder text.
 
@@ -1335,10 +1364,13 @@ Let's start by installing it with the following command.
 yarn add react-player
 ```
 
-Let's create a wrapper component using our **React Player** inside the `components/custom` folder. Create a `youtube-player.tsx` paste the following code inside.
+Let's create a wrapper component using our **React Player** inside the `components/custom` folder. Create a new folder called `client-youtube-player` and inside create two files `youtube-player.tsx` and `index.tsx` and add the following code.
+
+`youtube-player.tsx`
 
 ```tsx
 "use client";
+
 import ReactPlayer from "react-player/youtube";
 
 function generateYouTubeUrl(videoId: string) {
@@ -1348,7 +1380,7 @@ function generateYouTubeUrl(videoId: string) {
 }
 
 interface YouTubePlayerProps {
-  videoId: string | null;
+  videoId: string;
 }
 
 export default function YouTubePlayer({
@@ -1371,16 +1403,33 @@ export default function YouTubePlayer({
 }
 ```
 
+`index.tsx`
+
+```tsx
+"use client";
+
+import dynamic from "next/dynamic";
+
+const YouTubePlayer = dynamic(
+  () => import("@/components/custom/client-youtube-player/youtube-player"),
+  { ssr: false }
+);
+
+export default function ClientYouTubePlayer({ videoId }: { videoId: string }) {
+  return <YouTubePlayer videoId={videoId} />;
+}
+```
+
+In the code above, we use `dynamic` to disable SSR, which helps avoid issues when using some client-side components. In this blog post, you can read more [here](https://dev.to/kawanedres/leveraging-nextjs-dynamic-imports-to-solve-hydration-problems-5086).
+
+Next.js docs reference on solving hydration issues [here](https://nextjs.org/docs/messages/react-hydration-error#solution-2-disabling-ssr-on-specific-components)
+
 Now that we have our **React Player** let's update the `layout.tsx` file using the following code.
 
 ```tsx
-import dynamic from "next/dynamic";
-
 import { extractYouTubeID } from "@/lib/utils";
 import { getSummaryById } from "@/data/loaders";
-const NoSSR = dynamic(() => import("@/components/custom/youtube-player"), {
-  ssr: false,
-});
+import ClientYouTubePlayer from "@/components/custom/client-youtube-player";
 
 export default async function SummarySingleRoute({
   params,
@@ -1389,17 +1438,17 @@ export default async function SummarySingleRoute({
   readonly params: any;
   readonly children: React.ReactNode;
 }) {
-  const data = await getSummaryById(params.videoId);
+  const { videoId } = await params;
+  const data = await getSummaryById(videoId);
   if (data?.error?.status === 404) return <p>No Items Found</p>;
-  const videoId = extractYouTubeID(data.data.videoId);
+  const videoYTId = extractYouTubeID(data.data.videoId);
+
   return (
     <div>
       <div className="h-full grid gap-4 grid-cols-5 p-4">
         <div className="col-span-3">{children}</div>
         <div className="col-span-2">
-          <div>
-            <NoSSR videoId={videoId} />
-          </div>
+          <ClientYouTubePlayer videoId={videoYTId as string} />
         </div>
       </div>
     </div>
@@ -1407,22 +1456,24 @@ export default async function SummarySingleRoute({
 }
 ```
 
-In the code above, we use `dynamic` to disable SSR, which helps avoid issues when using some client-side components. In this blog post, you can read more [here](https://dev.to/kawanedres/leveraging-nextjs-dynamic-imports-to-solve-hydration-problems-5086).
-
-Next.js docs reference on solving hydration issues [here](https://nextjs.org/docs/messages/react-hydration-error#solution-2-disabling-ssr-on-specific-components)
-
 ![015-video.png](https://api-prod.strapi.io/uploads/015_video_f2737f55b1.png)
 
 Now, let's display our summary.
 
 Let's first create a new file called `summary-card-form.tsx`. We can add it to our `src/components/forms` folder and paste it into the following code.
 
+We are using **Tabs** component to switch between the preview and markdown editor. So make sure to install it by running the following command.
+
+```bash
+npx shadcn@latest add tabs
+```
+
 ```tsx
-// import { updateSummaryAction, deleteSummaryAction } from "@/data/actions/summary-actions";
+/// import { updateSummaryAction, deleteSummaryAction } from "@/data/actions/summary-actions";
+import { cn } from "@/lib/utils";
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
 
 import {
   Card,
@@ -1432,8 +1483,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { SubmitButton } from "@/components/custom/submit-button";
-import { DeleteButton } from "@/components/custom/delete-button";
+import ReactMarkdown from "react-markdown";
+// import { DeleteButton } from "@/components/custom/delete-button";
 
 export function SummaryCardForm({
   item,
@@ -1460,11 +1514,67 @@ export function SummaryCardForm({
               className="mb-4"
               defaultValue={item.title}
             />
-            <Textarea
-              name="summary"
-              className="flex w-full rounded-md bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:bg-gray-50 focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 mb-4 h-[calc(100vh-245px)] "
-              defaultValue={item.summary}
-            />
+            <div className="flex-1 flex flex-col">
+              <Tabs
+                defaultValue="preview"
+                className="flex flex-col h-full gap-2"
+              >
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="preview">Preview</TabsTrigger>
+                  <TabsTrigger value="markdown">Edit Markdown</TabsTrigger>
+                </TabsList>
+                <TabsContent value="preview" className="flex-1">
+                  <ReactMarkdown
+                    className="
+                    markdown-preview
+                    relative w-full h-[600px]
+                    overflow-auto scroll-smooth
+                    p-4 px-3 py-2
+                    text-sm
+                    bg-white dark:bg-gray-800 bg-transparent
+                    border border-gray-300 dark:border-gray-700
+                    rounded-md
+                    shadow-sm
+                    mb-4
+                    placeholder:text-muted-foreground
+                    focus-visible:outline-none
+                    focus-visible:bg-gray-50
+                    focus-visible:ring-1
+                    focus-visible:ring-ring
+                    disabled:cursor-not-allowed
+                    disabled:opacity-50
+                  "
+                  >
+                    {item.summary}
+                  </ReactMarkdown>
+                </TabsContent>
+                <TabsContent value="markdown" className="flex-1">
+                  <Textarea
+                    name="summary"
+                    className="
+                      markdown-preview
+                      relative w-full h-[600px]
+                      overflow-auto scroll-smooth
+                      p-4 px-3 py-2
+                      text-sm
+                      bg-white dark:bg-gray-800 bg-transparent
+                      border border-gray-300 dark:border-gray-700
+                      rounded-md
+                      shadow-sm
+                      mb-4
+                      placeholder:text-muted-foreground
+                      focus-visible:outline-none
+                      focus-visible:bg-gray-50
+                      focus-visible:ring-1
+                      focus-visible:ring-ring
+                      disabled:cursor-not-allowed
+                      disabled:opacity-50
+                    "
+                    defaultValue={item.summary}
+                  />
+                </TabsContent>
+              </Tabs>
+            </div>
             <input type="hidden" name="id" value={item.documentId} />
             <SubmitButton
               text="Update Summary"
@@ -1472,7 +1582,7 @@ export function SummaryCardForm({
             />
           </form>
           <form>
-            <DeleteButton className="absolute right-4 top-4 bg-red-700 hover:bg-red-600" />
+            {/* <DeleteButton className="absolute right-4 top-4 bg-red-700 hover:bg-red-600" /> */}
           </form>
         </div>
       </CardContent>
@@ -1482,7 +1592,104 @@ export function SummaryCardForm({
 }
 ```
 
-We are using a new component, **DeleteButton**. Let's create it inside our `components/custom` folder. Create a `delete-button.tsx` file and add the following code.
+Keep in mind that in the **ReactMarkdown** component, we are passing tailwind classes for basic styling.
+
+We are also passing a class name `markdown-preview` to the **ReactMarkdown** component.
+
+In order to get the styling, we will need to add the following to our `globals.css` file.
+
+```css
+/* ************************** */
+/* markdown preview start */
+/* ************************** */
+
+.markdown-preview {
+  @apply text-base;
+  @apply overflow-auto;
+}
+
+.markdown-preview h1 {
+  @apply text-3xl font-bold mt-6 mb-4;
+}
+
+.markdown-preview h2 {
+  @apply text-2xl font-semibold mt-5 mb-3;
+}
+
+.markdown-preview h3 {
+  @apply text-xl font-medium mt-4 mb-2;
+}
+
+.markdown-preview p {
+  @apply mb-4;
+}
+
+.markdown-preview ul,
+.markdown-preview ol {
+  @apply ml-6 mb-4;
+}
+
+.markdown-preview ul {
+  @apply list-disc;
+}
+
+.markdown-preview ol {
+  @apply list-decimal;
+}
+
+.markdown-preview li {
+  @apply mb-2;
+}
+
+.markdown-preview a {
+  @apply text-blue-600 hover:underline;
+}
+
+.markdown-preview blockquote {
+  @apply border-l-4 border-gray-300 pl-4 italic my-4;
+}
+
+.markdown-preview code {
+  @apply bg-gray-100 rounded px-1 py-0.5 font-mono text-sm;
+}
+
+.markdown-preview pre {
+  @apply bg-gray-100 rounded p-4 overflow-x-auto mb-4;
+}
+
+.markdown-preview pre code {
+  @apply bg-transparent p-0;
+}
+
+.markdown-preview table {
+  @apply w-full border-collapse mb-4;
+}
+
+.markdown-preview th,
+.markdown-preview td {
+  @apply border border-gray-300 px-4 py-2;
+}
+
+.markdown-preview th {
+  @apply bg-gray-100 font-semibold;
+}
+
+.markdown-preview img {
+  @apply max-w-full h-auto my-4;
+}
+
+.markdown-preview hr {
+  @apply my-8 border-t border-gray-300;
+}
+
+/* ************************** */
+/* markdown preview end       */
+/* ************************** */
+```
+
+Nice.
+
+Also, notice that we are using a new component, **DeleteButton**. Let's create it inside our `components/custom` folder. Create a `delete-button.tsx` file and add the following code. 
 
 ```tsx
 "use client";
@@ -1522,8 +1729,8 @@ export function DeleteButton({ className }: Readonly<DeleteButtonProps>) {
 Let's update our `page.tsx` file with the following code.
 
 ```tsx
-import { SummaryCardForm } from "@/components/forms/summary-card-form";
 import { getSummaryById } from "@/data/loaders";
+import { SummaryCardForm } from "@/components/custom/summary-card-form";
 
 interface ParamsProps {
   params: {
@@ -1531,10 +1738,10 @@ interface ParamsProps {
   };
 }
 
-export default async function SummaryCardRoute({
-  params,
-}: Readonly<ParamsProps>) {
-  const data = await getSummaryById(params.videoId);
+export default async function SummaryCardRoute(props: Readonly<ParamsProps>) {
+  const params = await props?.params;
+  const { videoId } = params;
+  const data = await getSummaryById(videoId);
   return <SummaryCardForm item={data.data} />;
 }
 ```
@@ -1715,7 +1922,7 @@ You will see that we are now setting our user data.
 
 ## Conclusion
 
-In part 6 of our Next.js 14 tutorial series, we tackled generating video summaries using Open AI and LangChain, a highlight feature for our Next.js app.
+In this part of our Next.js 15 tutorial series, we tackled generating video summaries using Open AI and LangChain, a highlight feature for our Next.js app.
 
 We built a SummaryForm component to handle user submissions and explored Next.js API routes for server-side logic.
 

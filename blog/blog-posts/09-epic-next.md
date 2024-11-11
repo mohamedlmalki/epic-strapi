@@ -1,4 +1,4 @@
-We have completed all the basic features for our YouTube Summarize AI app, which we have been working on. These include full CRUD functionality, authentication, search, pagination, and AI video summarization. If you still need to complete your project, check out our previous posts in this Epic Next.js 14 tutorial series.
+We have completed all the basic features for our YouTube Summarize AI app, which we have been working on. These include full CRUD functionality, authentication, search, pagination, and AI video summarization. If you still need to complete your project, check out our previous posts in this Epic Next.js 15 tutorial series.
 
 - [Part 1: Learn Next.js by building a website](https://strapi.io/blog/epic-next-js-14-tutorial-learn-next-js-by-building-a-real-life-project-part-1-2)
 - [Part 2: Building Out The Hero Section of the homepage](https://strapi.io/blog/epic-next-js-14-tutorial-part-2-building-out-the-home-page)

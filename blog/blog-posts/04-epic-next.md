@@ -1545,7 +1545,7 @@ By systematically checking each part of your authentication flow, you can identi
 
 ## Deploying Your Application
 
-Preparing your Next.js 14 application for deployment involves ensuring that your server settings are properly configured for security and performance.
+Preparing your Next.js 15 application for deployment involves ensuring that your server settings are properly configured for security and performance.
 
 ### Configuring Server Settings
 
@@ -1560,7 +1560,7 @@ By carefully configuring your server settings, you improve the security and reli
 
 ## Improving Your Application with Strapi
 
-By securing your Next.js 14 application with strong authentication, you've improved your web app's security and user experience. For more performance and flexibility, consider integrating with Strapi's headless CMS solutions.
+By securing your Next.js 15 application with strong authentication, you've improved your web app's security and user experience. For more performance and flexibility, consider integrating with Strapi's headless CMS solutions.
 
 Strapi offers headless CMS solutions that enhance performance and flexibility, catering to various business needs. These solutions integrate with any frontend framework and allow content to be published across multiple channels simultaneously, improving site performance, scalability, and providing a personalized experience.
 

@@ -220,7 +220,7 @@ Now, let's try our request once more in **Insomnia**.
 
 Nice. We are now **ONLY** getting one user, and it is the logged-in user. So, there is no way to get any other user's data.
 
-And when we check our Next.Js 14 front end. We are only getting that user's summaries.
+And when we check our Next.Js 15 front end. We are only getting that user's summaries.
 
 ![015-yay.png](https://api-prod.strapi.io/uploads/015_yay_8ff9cacc33.png)
 
@@ -404,7 +404,7 @@ Nice. We did it.
 
 ## Conclusion
 
-This tutorial covered essential aspects of CRUD operations and permission handling in Next.js 14 using Strapi as our backend.
+This tutorial covered essential aspects of CRUD operations and permission handling in Next.js 15 using Strapi as our backend.
 
 Starting with a basic understanding of CRUD—Create, Read, Update, and Delete—we implemented these operations with Strapi's HTTP methods and routes.
 
@@ -414,4 +414,4 @@ This approach enhances both the security and manageability of the application.
 
 This post scratches the surface, but it should be a great starting point for anyone looking to dive deeper into Strapi middleware, especially as it relates to using the `users-permission` plugin.
 
-We hope you enjoyed the content. We will see you in the next one, where we will cover pagination and search in Next.js 14.
+We hope you enjoyed the content. We will see you in the next one, where we will cover pagination and search in Next.js 15.

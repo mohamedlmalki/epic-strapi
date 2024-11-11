@@ -1700,7 +1700,7 @@ Excellent, we covered a lot in this post. Let's do a quick recap of what we cove
 
 ## Conclusion
 
-In Part 3 of the Epic Next.js 14 Tutorial series, we focused on completing the home page design of a real-life project. The tutorial covered several key areas:
+In Part 3 of the Epic 15 Tutorial series, we focused on completing the home page design of a real-life project. The tutorial covered several key areas:
 
 **Refactoring the Hero Section**: we refactored the Hero Section to use the Next.js Image component for optimized image handling. This included creating a custom StrapiImage component for additional quality-of-life improvements.
 
