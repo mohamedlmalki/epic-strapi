@@ -5,16 +5,16 @@ In the last post, we covered how to deploy our backend to **Strapi Cloud** and s
 If you missed the previous post, you can find them in the following links.
 
 
-- [Part 1: Learn Next.js by building a website](https://strapi.io/blog/epic-next-js-14-tutorial-learn-next-js-by-building-a-real-life-project-part-1-2)
-- [Part 2: Building Out The Hero Section of the homepage](https://strapi.io/blog/epic-next-js-14-tutorial-part-2-building-out-the-home-page)
-- [Part 3: Finish up up the homepage Features Section, TopNavigation and Footer](https://strapi.io/blog/epic-next-js-14-tutorial-learn-next-js-by-building-a-real-life-project-part-3)
-- [Part 4: How to handle login and Authentication in Next.js](https://strapi.io/blog/epic-next-js-14-tutorial-part-4-how-to-handle-login-and-authentication-in-next-js)
-- [Part 5: File upload using server actions](https://strapi.io/blog/epic-next-js-14-tutorial-part-5-file-upload-using-server-actions)
-- [Part 6: Get Video Transcript with OpenAI Function](https://strapi.io/blog/epic-next-js-14-tutorial-part-6-create-video-summary-with-next-js-and-open-ai)
-- [Part 7: Strapi CRUD permissions](https://strapi.io/blog/epic-next-js-14-tutorial-part-7-next-js-and-strapi-crud-permissions)
-- [Part 8: Search & pagination in Next.js](https://strapi.io/blog/epic-next-js-14-tutorial-part-8-search-and-pagination-in-next-js)
-- [Part 9: Backend deployment to Strapi Cloud](https://strapi.io/blog/epic-next-js-14-tutorial-part-9-backend-deployment-to-strapi-cloud)
-- **Part 10: Frontend deployment to Vercel**
+- [Part 1: Learn Next.js by building a website](https://strapi.io/blog/epic-next-js-15-tutorial-part-1-learn-next-js-by-building-a-real-life-project)
+- [Part 2: Building Out The Hero Section of the homepage](https://strapi.io/blog/epic-next-js-15-tutorial-part-2-building-out-the-home-page)
+- [Part 3: Finishup up the homepage Features Section, TopNavigation and Footer](https://strapi.io/blog/epic-next-js-15-tutorial-part-3-finishup-up-the-homepage-features-section-top-navigation-and-footer)
+- [Part 4: How to handle login and Authentification in Next.js](https://strapi.io/blog/epic-next-js-15-tutorial-part-4-how-to-handle-login-and-authentication-in-next-js)
+- [Part 5: Building out the Dashboard page and upload file using NextJS server actions](https://strapi.io/blog/epic-next-js-15-tutorial-part-5-file-upload-using-server-actions)
+- [Part 6: Get Video Transcript with OpenAI Function](https://strapi.io/blog/epic-next-js-15-tutorial-part-6-create-video-summary-with-next-js-and-open-ai)
+- [Part 7: Strapi CRUD permissions](https://strapi.io/blog/epic-next-js-15-tutorial-part-7-next-js-and-strapi-crud-permissions) 
+- [Part 8: Search & pagination in Nextjs](https://strapi.io/blog/epic-next-js-15-tutorial-part-8-search-and-pagination-in-next-js)
+- [Part 9: Backend deployment to Strapi Cloud](https://strapi.io/blog/epic-next-js-15-tutorial-part-9-backend-deployment-to-strapi-cloud)
+- Part 10: Frontend deployment to Vercel](https://strapi.io/blog/epic-next-js-15-tutorial-part-10-frontend-deployment-to-vercel)
 
 ## Let's Create a Vercel Account.
 
@@ -84,13 +84,13 @@ yarn dev
 ```
 
 ```bash
-$ next dev
-   ▲ Next.js 15.0.3
-   - Local:        http://localhost:3000
-   - Environments: .env.local
+➜  frontend git:(main) ✗ yarn dev
+ ▲ Next.js 14.2.14
+  - Local:        http://localhost:3000
+  - Environments: .env.local
 
  ✓ Starting...
- ✓ Ready in 1841ms
+ ✓ Ready in 1548ms
 
 ```
 
@@ -125,11 +125,11 @@ It will be your project URL appended by `.media.strapiapp.com`. I just used mine
 
 Let's log in and create one summary as a test.
 
-![005-test-localy.gif](../images/10-epic-next/005-test-localy.gif)
+![005-test-localy.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/005_test_localy_2867b8b4a7.gif)
 
 Excellent, it worked locally. Now, navigate to your Strapi CMS Admin on Strapi Cloud. You should see the newly created summary in your deployed Strapi project.
 
-![006-strapi.gif](../images/10-epic-next/006-strapi.gif)
+![006-strapi.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/006_strapi_cf0f66b405.gif)
 
 ### Building Project Locally
 
@@ -536,13 +536,13 @@ You can start [here](https://vercel.com/docs/functions/streaming). Next.js also 
 
 ## Conclusion
 
-It may seem like the end of the blog series, but it is just the beginning. We learned how to build a complete CRUD Next.js application with authentication and file upload functionality. We explored how to utilize Strapi CMS to manage our content and users. You know, have a great starting point to continue building and adding new features. We also deployed our project to Strapi Cloud and Vercel. We could have taken many other approaches. For instance, we could have moved all the summarization logic into Strapi as a plugin. We could also use a queuing system to handle long-executing tasks and return them as they are done rather than waiting for them.
+It may seem like the end of the blog series, but it is just the beginning. We learned how to build a complete CRUD Next.js application with authentication and file upload functionality. We explored how to utilize Strapi CMS to manage our content and users. 
+
+You know, have a great starting point to continue building and adding new features. We also deployed our project to Strapi Cloud and Vercel. We could have taken many other approaches. For instance, we could have moved all the summarization logic into Strapi as a plugin. We could also use a queuing system to handle long-executing tasks and return them as they are done rather than waiting for them.
 
 But with that being said, thank you so much for your time. This tutorial/video series took me a long time to make, and I hope you had fun following along. Also, if you spot any mistakes or have questions, please leave them in the comments, and I will update the blog post accordingly.
 
 Even though this is the end of this series, as I discover new cool things around Next.js and Strapi, I will create follow-up content and updates. Also, I will move this repo to Strapi's GitHub. It will be open-source, so anyone can help us improve or use it as a starting point for a new project. I will add the link here once I am done.
-
-Thank you. If you want to share your feedback, good or bad, you can find me hanging out in Strapi's "open office" Monday through Friday at 12:30 PM CST. You can also join us via [Discord](https://discord.com/invite/strapi).
 
 ### Note about this project
 
@@ -554,7 +554,7 @@ If you have a suggestion or find a mistake in the post, please open an issue on 
 
 You can also find the blog post content in the [Strapi Blog](https://github.com/PaulBratslavsky/epic-next-15-strapi-5/tree/main/blog/blog-posts).
 
-Fell free to make PRs to fix any issues you find in the project or let me know if you have any questions.
+Feel free to make PRs to fix any issues you find in the project, or let me know if you have any questions.
 
 Happy coding!
 
