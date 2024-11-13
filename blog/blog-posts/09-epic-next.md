@@ -1,16 +1,15 @@
-We have completed all the basic features for our YouTube Summarize AI app, which we have been working on. These include full CRUD functionality, authentication, search, pagination, and AI video summarization. If you still need to complete your project, check out our previous posts in this Epic Next.js 15 tutorial series.
+We have completed all the basic features for our YouTube Summarize AI app, which we have been working on. These include full CRUD functionality, authentication, search, pagination, and AI video summarization. If you still need to complete your project, check out our previous posts in this Epic Next.js 14 tutorial series.
 
-- [Part 1: Learn Next.js by building a website](https://strapi.io/blog/epic-next-js-14-tutorial-learn-next-js-by-building-a-real-life-project-part-1-2)
-- [Part 2: Building Out The Hero Section of the homepage](https://strapi.io/blog/epic-next-js-14-tutorial-part-2-building-out-the-home-page)
-- [Part 3: Finish up up the homepage Features Section, TopNavigation and Footer](https://strapi.io/blog/epic-next-js-14-tutorial-learn-next-js-by-building-a-real-life-project-part-3)
-- [Part 4: How to handle login and Authentication in Next.js](https://strapi.io/blog/epic-next-js-14-tutorial-part-4-how-to-handle-login-and-authentication-in-next-js)
-- [Part 5: File upload using server actions](https://strapi.io/blog/epic-next-js-14-tutorial-part-5-file-upload-using-server-actions)
-- [Part 6: Get Video Transcript with OpenAI Function](https://strapi.io/blog/epic-next-js-14-tutorial-part-6-create-video-summary-with-next-js-and-open-ai)
-- [Part 7: Strapi CRUD permissions](https://strapi.io/blog/epic-next-js-14-tutorial-part-7-next-js-and-strapi-crud-permissions)
-- [Part 8: Search & pagination in Next.js](https://strapi.io/blog/epic-next-js-14-tutorial-part-8-search-and-pagination-in-next-js)
-- **Part 9: Backend deployment to [Strapi Cloud](https://cloud.strapi.io/login)**
-- [Part 10: Frontend deployment to Vercel](https://strapi.io/blog/epic-next-js-14-tutorial-part-10-frontend-deployment-to-vercel)
-
+- [Part 1: Learn Next.js by building a website](https://strapi.io/blog/epic-next-js-15-tutorial-part-1-learn-next-js-by-building-a-real-life-project)
+- [Part 2: Building Out The Hero Section of the homepage](https://strapi.io/blog/epic-next-js-15-tutorial-part-2-building-out-the-home-page)
+- [Part 3: Finishup up the homepage Features Section, TopNavigation and Footer](https://strapi.io/blog/epic-next-js-15-tutorial-part-3-finishup-up-the-homepage-features-section-top-navigation-and-footer)
+- [Part 4: How to handle login and Authentification in Next.js](https://strapi.io/blog/epic-next-js-15-tutorial-part-4-how-to-handle-login-and-authentication-in-next-js)
+- [Part 5: Building out the Dashboard page and upload file using NextJS server actions](https://strapi.io/blog/epic-next-js-15-tutorial-part-5-file-upload-using-server-actions)
+- [Part 6: Get Video Transcript with OpenAI Function](https://strapi.io/blog/epic-next-js-15-tutorial-part-6-create-video-summary-with-next-js-and-open-ai)
+- [Part 7: Strapi CRUD permissions](https://strapi.io/blog/epic-next-js-15-tutorial-part-7-next-js-and-strapi-crud-permissions) 
+- [Part 8: Search & pagination in Nextjs](https://strapi.io/blog/epic-next-js-15-tutorial-part-8-search-and-pagination-in-next-js)
+- [Part 9: Backend deployment to Strapi Cloud](https://strapi.io/blog/epic-next-js-15-tutorial-part-9-backend-deployment-to-strapi-cloud)
+- [Part 10: Frontend deployment to Vercel](https://strapi.io/blog/epic-next-js-15-tutorial-part-10-frontend-deployment-to-vercel)
 
 This post will cover how to deploy your project to **Strapi Cloud**. 
 
@@ -41,7 +40,7 @@ To deploy your project, you just need a GitHub repo with your project. Since you
 
 Here is the repo of my project.
 
-![03-git-hub-repo.png](../images/09-epic-next/03-git-hub-repo.png)
+![03-git-hub-repo.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/03_git_hub_repo_2a4338d9b0.png)
 
 Let's get started.
 
@@ -67,7 +66,7 @@ You should be greeted with the following page. Let's click the `Create Project` 
 
 You will be greeted with the following screen to give **Strapi Cloud** a try. Notice that you do not have to provide your credit card.
 
-![07-free-trial.png](../images/09-epic-next/07-free-trial.png)
+![07-free-trial.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/07_free_trial_af7bffb8d7.png)
 
 Click the `Create my project` button to continue.
 
@@ -77,33 +76,33 @@ Now, import your project via GitHub. Click on the button and follow the steps.
 
 Once you authorize GitHub, you should see the following page. If not, you may need to refresh your browser.
 
-![09-github-repo.png](../images/09-epic-next/09-github-repo.png)
+![09-github-repo.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/09_github_repo_0ec3372d7a.png)
 
 Notice I chose my GitHub account `PaulBratslavsky` and pointed to my repository `strapi-5-next-14-project-deploy.`
 
 Let's continue by completing the steps in the **Setup** section. 
 
-![10-setup.png](../images/09-epic-next/10-setup.png)
+![10-setup.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/10_setup_6e4a428530.png)
 
 I will give my project a **Display Name**, point to my **main** branch, and select **New York** as my region.
 
 Afterward, we will click on the `Show advanced settings` button. Since our `frontend` and `backend` are in the same repo, we need to point to our Strapi CMS project in the `/backend` folder.
 
-![11-create-project.png](../images/09-epic-next/11-create-project.png)
+![11-create-project.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/11_create_project_42edaf6f0f.png)
 
 I will keep the default node version, and since we don't have any environment variables, I will click on the `Create project` button.
 
 You should see the following screen.
 
-![12-starting.png](../images/09-epic-next/12-starting.png)
+![12-starting.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/12_starting_bdd8afb5e0.png)
 
 As the process continues, you will be redirected to the following page, where you should see the real-time logs for your deployment process.
 
-![13-deploying.png](../images/09-epic-next/13-deploying.png)
+![13-deploying.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/13_deploying_9a0e21941b.png)
 
 Once your project finishes deploying, you should see the following screen. You can continue your project by clicking the `Visit app` button.  
 
-![14-complete.png](../images/09-epic-next/14-complete.png)
+![14-complete.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/14_complete_70de5ee45e.png)
 
 If you get the `This site can't provide a secure connection` message, you have to give it a moment to allow all the changes to propagate. 
 
@@ -111,11 +110,11 @@ If you get the `This site can't provide a secure connection` message, you have t
 
 Once the process is finished, you will be greeted with the **Create Admin** user screen.  
 
-![16-login.png](../images/09-epic-next/16-login.png)
+![16-login.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/16_login_d71b5fde13.png)
 
 Go ahead and create your first user. Once you have done so, you will be greeted with the Strapi dashboard screen.
 
-![17-dashboard.png](https://api-prod.strapi.io/uploads/17_dashboard_abc303e1ef.png)
+![17-dashboard.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/17_dashboard_d47e54bae6.png)
 
 Congratulations, you have deployed your very first Strapi project. 
 
@@ -125,15 +124,13 @@ As a bonus, let's examine how we can transfer local Strapi data to seed our new 
 
 Let's start by logging into Strapi cloud, going to our deployed application, and logging in.
 
-![18-dashboard.gif](../images/09-epic-next/18-dashboard.gif)
-
 In your Strapi admin panel, click on the `Visit App` button. This will take you to your deployed app.
 
 Enter your credentials to log in.
 
 Navigate to `Settings` => `Transfer Tokens` and click the `Add new Transfer Token` button.
 
-![20-settings.png](../images/09-epic-next/20-settings.png)
+![20-settings.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/20_settings_5be6a57f6a.png)
 
 Fill it the following options.
 
@@ -146,9 +143,7 @@ And finally, click the `Save` button.
 
 You should now see your generated token.
 
-![22-generated-token.png](../images/09-epic-next/22-generated-token.png)
-
-We will keep this open because we need our project's url and token for the next step.
+![22-generated-token.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/22_generated_token_90673c1dac.png)
 
 To transfer our data, we will use the Strapi CLI Transfer command. 
 
@@ -189,8 +184,7 @@ In my case, it is `https://clever-dawn-ec1866942d.strapiapp.com/admin` Notice I 
 
 To start the transfer, I will type the following in my terminal: You will need to use your URL and Token, which we just generated.
 
-![22-generated-token.png](../images/09-epic-next/22-generated-token.png)
-
+![22-generated-token.png](https://delicate-dawn-ac25646e6d.media.strapiapp.com/22_generated_token_90673c1dac.png)
 
 ``` bash
 yarn strapi transfer --to https://clever-dawn-ec1866942d.strapiapp.com/admin
@@ -265,7 +259,8 @@ Transfer process has been completed successfully!
 
 Once you finish, go back into your Strapi Project, which we deployed in the cloud, hit refresh, and you should now see your data.
 
-![23-after-transfer.gif](https://api-prod.strapi.io/uploads/23_after_transfer_ef4ddc2751.gif)
+![23-after-transfer.gif](https://delicate-dawn-ac25646e6d.media.strapiapp.com/23_after_transfer_26d1653d5f.gif)
+We will keep this open because we need our project's url and token for the next step.
 
 Nice. We just seeded our initial data into our Cloud App.
 
@@ -283,9 +278,8 @@ If you have a suggestion or find a mistake in the post, please open an issue on 
 
 You can also find the blog post content in the [Strapi Blog](https://github.com/PaulBratslavsky/epic-next-15-strapi-5/tree/main/blog/blog-posts).
 
-Fell free to make PRs to fix any issues you find in the project or let me know if you have any questions.
+Feel free to make PRs to fix any issues you find in the project, or let me know if you have any questions.
 
 Happy coding!
 
 - Paul
-
