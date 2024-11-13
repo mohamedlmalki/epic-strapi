@@ -1,17 +1,15 @@
 In the previous tutorial, we finished our **Home Page**, so we will build out our **Sign In** and **Sign Up** Pages and hook up the logic to allow us to sign in and sign up.
 
-- [Part 1: Learn Next.js by building a website](https://strapi.io/blog/epic-next-js-14-tutorial-learn-next-js-by-building-a-real-life-project-part-1-2)
-- [Part 2: Building Out The Hero Section of the homepage](https://strapi.io/blog/epic-next-js-14-tutorial-part-2-building-out-the-home-page)
-- [Part 3: Finishing up the homepage Features Section, TopNavigation and Footer](https://strapi.io/blog/epic-next-js-14-tutorial-learn-next-js-by-building-a-real-life-project-part-3)
-- **Part 4: How to handle login and Authentification in Next.js**
-- [Part 5: Building out the Dashboard page and uploading file using NextJS server actions](https://strapi.io/blog/epic-next-js-14-tutorial-part-5-file-upload-using-server-actions)
-- [Part 6: Get Video Transcript with OpenAI Function](https://strapi.io/blog/epic-next-js-14-tutorial-part-6-create-video-summary-with-next-js-and-open-ai)
-- [Part 7: Strapi CRUD permissions](https://strapi.io/blog/epic-next-js-14-tutorial-part-7-next-js-and-strapi-crud-permissions)
-- [Part 8: Search & pagination](https://strapi.io/blog/epic-next-js-14-tutorial-part-8-search-and-pagination-in-next-js)
-- [Part 9: Backend deployment to Strapi Cloud](https://strapi.io/blog/epic-next-js-14-tutorial-part-9-backend-deployment-to-strapi-cloud)
-- [Part 10: Frontend deployment to Vercel](https://strapi.io/blog/epic-next-js-14-tutorial-part-10-frontend-deployment-to-vercel)
-
-![018-signin.gif](https://api-prod.strapi.io/uploads/018_signin_14be7909e1.gif)
+- [Part 1: Learn Next.js by building a website](https://strapi.io/blog/epic-next-js-15-tutorial-part-1-learn-next-js-by-building-a-real-life-project)
+- [Part 2: Building Out The Hero Section of the homepage](https://strapi.io/blog/epic-next-js-15-tutorial-part-2-building-out-the-home-page)
+- [Part 3: Finishup up the homepage Features Section, TopNavigation and Footer](https://strapi.io/blog/epic-next-js-15-tutorial-part-3-finishup-up-the-homepage-features-section-top-navigation-and-footer)
+- [Part 4: How to handle login and Authentification in Next.js](https://strapi.io/blog/epic-next-js-15-tutorial-part-4-how-to-handle-login-and-authentication-in-next-js)
+- [Part 5: Building out the Dashboard page and upload file using NextJS server actions](https://strapi.io/blog/epic-next-js-15-tutorial-part-5-file-upload-using-server-actions)
+- [Part 6: Get Video Transcript with OpenAI Function](https://strapi.io/blog/epic-next-js-15-tutorial-part-6-create-video-summary-with-next-js-and-open-ai)
+- [Part 7: Strapi CRUD permissions](https://strapi.io/blog/epic-next-js-15-tutorial-part-7-next-js-and-strapi-crud-permissions) 
+- [Part 8: Search & pagination in Nextjs](https://strapi.io/blog/epic-next-js-15-tutorial-part-8-search-and-pagination-in-next-js)
+- [Part 9: Backend deployment to Strapi Cloud](https://strapi.io/blog/epic-next-js-15-tutorial-part-9-backend-deployment-to-strapi-cloud)
+- [Part 10: Frontend deployment to Vercel](https://strapi.io/blog/epic-next-js-15-tutorial-part-10-frontend-deployment-to-vercel)
 
 Let's start by creating our routes.
 
@@ -1545,7 +1543,7 @@ By systematically checking each part of your authentication flow, you can identi
 
 ## Deploying Your Application
 
-Preparing your Next.js 15 application for deployment involves ensuring that your server settings are properly configured for security and performance.
+Preparing your Next.js 14 application for deployment involves ensuring that your server settings are properly configured for security and performance.
 
 ### Configuring Server Settings
 
@@ -1560,7 +1558,7 @@ By carefully configuring your server settings, you improve the security and reli
 
 ## Improving Your Application with Strapi
 
-By securing your Next.js 15 application with strong authentication, you've improved your web app's security and user experience. For more performance and flexibility, consider integrating with Strapi's headless CMS solutions.
+By securing your Next.js 14 application with strong authentication, you've improved your web app's security and user experience. For more performance and flexibility, consider integrating with Strapi's headless CMS solutions.
 
 Strapi offers headless CMS solutions that enhance performance and flexibility, catering to various business needs. These solutions integrate with any frontend framework and allow content to be published across multiple channels simultaneously, improving site performance, scalability, and providing a personalized experience.
 
@@ -1590,9 +1588,8 @@ If you have a suggestion or find a mistake in the post, please open an issue on 
 
 You can also find the blog post content in the [Strapi Blog](https://github.com/PaulBratslavsky/epic-next-15-strapi-5/tree/main/blog/blog-posts).
 
-Fell free to make PRs to fix any issues you find in the project or let me know if you have any questions.
+Feel free to make PRs to fix any issues you find in the project, or let me know if you have any questions.
 
 Happy coding!
 
 - Paul
-
