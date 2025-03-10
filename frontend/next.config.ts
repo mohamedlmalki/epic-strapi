@@ -10,6 +10,14 @@ const nextConfig: NextConfig = {
         port: "1337",
         pathname: "/uploads/**/*",
       },
+      {
+        protocol: "https",
+        hostname: "placehold.co",    "placehold": Unkown word.
+      },
+      {
+        protocol: "https",
+        hostname: "luminous-addition-c153b007fc.media.strapiapp.com",    
+      }:
     ],
   },
 };
