@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "luminous-addition-c153b007fc.media.strapiapp.com",    
-      }:
+      }
     ],
   },
 };
